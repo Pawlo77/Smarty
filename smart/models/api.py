@@ -1,6 +1,6 @@
-from datasets import DataSet, train_test_split, cross_val_split
-from .metrics import accuracy
-from errors import assertion
+from smart.datasets import DataSet, train_test_split, cross_val_split
+from smart.errors import assertion
+from .metrics import mean_squared_error
 
 
 SAMPLINGS_METHODS = (
@@ -9,15 +9,15 @@ SAMPLINGS_METHODS = (
 )
 
 # accepts an unfitted model, trains it according to sampling_method and returns calculated metric
-def evaluate_model(ds, model, metric, sampling_method="train_test_split", *args, **kwargs):
+def evaluate_model(ds, model, metric=mean_squared_error, sampling_method="train_test_split", *args, **kwargs):
     assertion(sampling_method in SAMPLINGS_METHODS, "Sampling method not recognised, see models.api.SAMPLING_METHODS to see available one.")    
 
     if sampling_method == "train_test_split":
-        return evaluate_train_test_split(ds, model, metric, *args, **kwargs)
+        return _evaluate_train_test_split(ds, model, metric, *args, **kwargs)
     else: # "cross_val"
-        return evaluate_cross_val_test_split(ds, model, metric, **kwargs)
+        return _evaluate_cross_val_test_split(ds, model, metric, **kwargs)
 
-def evaluate_cross_val_test_split(ds, model, metric, *args, **kwargs):
+def _evaluate_cross_val_test_split(ds, model, metric, *args, **kwargs):
     # by default drop reminder for cross_validation, which if relatively small might strongly affect model's score
     if "drop_reminder" not in kwargs: 
         kwargs["drop_reminder"] = True
@@ -41,7 +41,7 @@ def evaluate_cross_val_test_split(ds, model, metric, *args, **kwargs):
         scores.append(metric(test_ds.get_target_classes(), y_pred))
     return scores
 
-def evaluate_train_test_split(ds, model, metric, *args, **kwargs):
+def _evaluate_train_test_split(ds, model, metric, *args, **kwargs):
     train_ds, test_ds = train_test_split(ds, *args, **kwargs)
     history = model.fit(train_ds, *args, **kwargs)
     y_pred = model.predict(test_ds, *args, **kwargs)

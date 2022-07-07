@@ -2,9 +2,10 @@
 
 import numpy as np
 
-from errors import assertion
+from smart.errors import assertion
 from .utils import prepare_ds, print_epoch, print_step
 from .api import evaluate_model
+from .metrics import mean_squared_error
 
 
 DUMB_SOLVERS = (
@@ -13,7 +14,7 @@ DUMB_SOLVERS = (
 )
 
 # shortcut to evaluate_model that is "dumb", choosen by string parameter mode
-def evaluate_dumb(ds, metric, solver="random", *args, **kwargs):
+def evaluate_dumb(ds, metric=mean_squared_error, solver="random", *args, **kwargs):
     assertion(solver in DUMB_SOLVERS, "Mode not recognised, see models.dumb.DUMB_SOLVERS to see available modes.")
 
     if solver =="random":

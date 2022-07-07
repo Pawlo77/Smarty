@@ -1,7 +1,7 @@
 import numpy as np
 
-from errors import assertion
-from datasets import DataSet
+from smart.errors import assertion
+from smart.datasets import DataSet
 
 # each function from there requires data as np.ndarray
 # tested only against y, y_pred being 1D arrays

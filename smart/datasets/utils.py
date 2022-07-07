@@ -2,7 +2,7 @@ import numpy as np
 import requests
 
 from .datasets import DataSet
-from errors import assertion
+from smart.errors import assertion
 
 
 # loads datafile from disc / url link and returns DataSet object
@@ -40,19 +40,19 @@ def train_test_split(ds, split_ratio=0.8, shuffle=True, seed=42, *args, **kwargs
     if isinstance(ds, DataSet):
         kw["columns"] = ds.columns_
         kw["dtypes"] = ds.dtypes_
-        target = ds.target_classes_
-        ds = ds.numpy()
+        data = ds.numpy()
+    else:
+        data = ds
     
     train_set = DataSet().from_object(
-        ds[indeces[:train_size], :], **kw
+        data[indeces[:train_size], :], **kw
     )
     test_set = DataSet().from_object(
-        ds[indeces[train_size:], :], **kw
+        data[indeces[train_size:], :], **kw
     )
 
-    if target is not None: # set target classes if available
-        for ds in [train_set, test_set]:
-            ds.set_target_classes(target)
+    ds.train_copy(train_set)
+    ds.train_copy(test_set)
     return train_set, test_set
 
 # accepts np.ndarray or DataSet
@@ -70,26 +70,26 @@ def cross_val_split(ds, folds=3, shuffle=True, seed=42, drop_reminder=False, *ar
     if isinstance(ds, DataSet):
         kw["columns"] = ds.columns_
         kw["dtypes"] = ds.dtypes_
-        target = ds.target_classes_
-        ds = ds.numpy()
+        data = ds.numpy()
+    else:
+        data = ds
 
     splits = []
     s = 0
-    while s + fold_size < len(ds):
+    while s + fold_size <= len(ds):
         idxs = indeces[s:s + fold_size]
         s += fold_size
 
         splits.append(DataSet().from_object(
-            ds[idxs, :], **kw
+            data[idxs, :], **kw
         )) 
 
-    if not drop_reminder and s != len(ds):
+    if not drop_reminder and s != len(data):
         idxs = indeces[s:]
         splits.append(DataSet().from_object(
-            ds[idxs, :], **kw
+            data[idxs, :], **kw
         ))
 
-    if target is not None: # set target classes if available
-        for ds in splits: 
-            ds.set_target_classes(target)
+    for idx in range(len(splits)):
+        ds.train_copy(splits[idx])
     return splits

@@ -1,6 +1,6 @@
-from errors import assertion
-
 import numpy as np
+
+from smart.errors import assertion
 
 
 class OneHotEncoder:

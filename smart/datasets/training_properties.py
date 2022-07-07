@@ -1,6 +1,6 @@
 import numpy as np
 
-from errors import assertion
+from smart.errors import assertion
 
 
 class TrainingProperty:
@@ -19,7 +19,7 @@ class TrainingProperty:
         self.data_classes_ = None
         
     # called by native DataSet copy, new - new DataSet object
-    def copy(self, new):
+    def train_copy(self, new):
         new.batch_size_ = self.batch_size_
         new.repeat_ = self.repeat_
         new.shuffle_ = self.shuffle_
@@ -43,7 +43,7 @@ class TrainingProperty:
     # if opt is an integer - how many times to loop through the dataset, for bool True - infinitive
     def repeat(self, opt=True):
         assertion(isinstance(opt, int) or isinstance(opt, bool), "Repeat must be a bool or integer")
-        if opt == True:
+        if isinstance(opt, bool) and opt == True:
             self.repeat_ = np.inf
         else:
             self.repeat_ = opt
@@ -126,15 +126,20 @@ class TrainingProperty:
             np.random.shuffle(self._indeces_)
 
     def __next__(self):
-        if self.repeat_ is not False and self._row_num_ <= 0: # repeat dataset next time
-            self._row_num_ = len(self)
-            self.repeat_ -= 1 
+        def next_epoch():
+            if self.repeat_ is not False and self._row_num_ <= 0: # repeat dataset next time
+                self._row_num_ = len(self)
+                self.repeat_ -= 1 
 
-            if self.repeat_ == 0:
-                raise StopIteration
+                if self.repeat_ == 0:
+                    raise StopIteration
 
+        next_epoch()
         if self._row_num_ > 0: # if we still have some data to yield
             size = min(self._row_num_, self.batch_size_)
+
+            if size != self.batch_size_ and self.drop_reminder_:
+                next_epoch()
 
             # if sice exceedes remaining _incedes_
             if self._start_batch_idx_ + size > len(self._indeces_):
@@ -149,9 +154,9 @@ class TrainingProperty:
             self._row_num_ -= size # we used next size rows
             idxs = idxs.reshape(-1, 1)
             if self.target_classes_ is not None: # supervised learning
-                return self.get_data_classes(), self.get_target_classes()
+                return self.matrix_[idxs, self.data_classes_], self.matrix_[idxs, self.target_classes_]
             else: # unsupervised learning or not learning at all
-                return self.get_data_classes()
+                return self.matrix_[idxs, :]
         else: # we yielded everything we could
             raise StopIteration
 

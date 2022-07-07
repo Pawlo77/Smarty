@@ -14,19 +14,23 @@
 # en = OneHotEncoder().fit(target["species"])
 # target["species"] = en.encode(target["species"])
 
-from datasets import load_data
-from models.linear import LinearRegression
-from models.metrics import mean_squared_error
-from models.api import evaluate_model
+from smart.datasets import load_data
+from smart.models.linear import LinearRegression
+from smart.models.api import evaluate_model
+from smart.models.dumb import evaluate_dumb
+from smart.config import set_config
+
+# set_config("VERBOSE", False)
 
 ds = load_data("auto-insurance.csv", header=False)
 ds.set_target_classes(1)
 
-
-lr = LinearRegression(solver="norm_eq")
-# lr.fit(ds, batch_size=32)
+lr = LinearRegression(learning_rate=0.001)
+# lr.fit(ds, batch_size=32, epochs=5, repeat=5)
 # print(lr.coefs_, lr.bias_)
 # y_pred = lr.predict(ds)
 
-scores = evaluate_model(ds, lr, mean_squared_error, batch_size=32)
+scores = evaluate_model(ds, lr, batch_size=32, epochs=25, repeat=25, sampling_method="cross_val", drop_reminder=False)
 print(scores)
+# 
+# print(evaluate_dumb(ds))

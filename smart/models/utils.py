@@ -1,7 +1,8 @@
 import inspect
 
-from datasets import DataSet
-from errors import assertion
+from smart.datasets import DataSet
+from smart.errors import assertion
+from smart.config import get_config
 
 
 # pretty display calculated confision matrix
@@ -23,25 +24,31 @@ def display_conf(conf, classes, display_names=False):
 def prepare_ds(mode="supervised"):
     def wrapper(func):
         def prepare(*args, **kwargs):
-            args = inspect.getcallargs(func, *args, **kwargs)
-            kwargs = args.pop("kwargs")
+            rest = inspect.getcallargs(func, *args, **kwargs)
+            kwargs = rest.pop("kwargs")
+            args = rest.pop("args")
 
-            assertion(isinstance(args["ds"], DataSet), "Model entry must be a datasets.DataSet")
+            assertion(isinstance(rest["ds"], DataSet), "Model entry must be a datasets.DataSet")
             if mode == "supervised":
-                assertion(args["ds"].target_classes_ is not None, "DataSet without specified target.")
+                assertion(rest["ds"].target_classes_ is not None, "DataSet without specified target.")
 
             if "batch_size" in kwargs:
-                args["ds"].batch(kwargs["batch_size"])
+                rest["ds"].batch(kwargs["batch_size"])
             if "repeat" in kwargs:
-                args["ds"].repeat(kwargs["repeat"])
+                rest["ds"].repeat(kwargs["repeat"])
             if "shuffle" in kwargs:
-                args["ds"].shuffle(kwargs["shuffle"]) 
+                rest["ds"].shuffle(kwargs["shuffle"]) 
+            if "drop_reminder" in kwargs:
+                rest["ds"].drop_reminder_ = kwargs["drop_reminder"]
 
-            return func(**args, **kwargs)
+            return func(*args, **rest, **kwargs)
         return prepare
     return wrapper
     
 def print_epoch(epoch, max_epoch, initial_message="train"):
+    if not get_config("VERBOSE"):
+        return
+
     if epoch == 1:
         print("<*>" * 15)
 
@@ -56,8 +63,10 @@ def print_epoch(epoch, max_epoch, initial_message="train"):
 
 # model training utility function to check its performance
 def print_step(step, max_step, *args, **kwargs):
-    print(f"\r\tStep {step}/{max_step}", end="")
+    if not get_config("VERBOSE"):
+        return
 
+    print(f"\r\tStep {step}/{max_step}", end="")
     if kwargs:
         print(" - ", end="")
         for name, val in kwargs.items():

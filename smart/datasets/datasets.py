@@ -1,7 +1,8 @@
 import numpy as np
 import requests
 
-from errors import assertion
+from smart.errors import assertion
+from smart.config import get_config, set_config
 from .training_properties import TrainingProperty
 from .stats_properties import StatisticsProperty
 
@@ -12,8 +13,6 @@ INT_TYPES = (
 FLOAT_TYPES = (
     np.float16, np.float32, np.float64,
 )
-# enables / disables auto detection, administrated by DummyWriter
-_AUTO_DETECTION = True
 
 
 class DataCol:
@@ -21,7 +20,7 @@ class DataCol:
         if isinstance(col, np.ndarray):
             if dtype is not None: # if any dtype passed 
                 return col.astype(dtype)
-            if _AUTO_DETECTION: # if auto detection is enabled
+            if get_config("_AUTO_DETECTION"): # if auto detection is enabled
                 return DataCol._find_type(col)
             return col
         if dtype is not None:
@@ -57,10 +56,10 @@ class DummyWriter:
         self.root = root
 
     def __enter__(self, *args): # turn off auto dtype detection on entry
-        _AUTO_DETECTION = False
+        set_config("_AUTO_DETECTION", False)
 
     def __exit__(self, *args): # turn on auto dtype detection on exit
-        _AUTO_DETECTION = True
+        set_config("_AUTO_DETECTION", True)
 
 
 class DataSet(TrainingProperty, StatisticsProperty):
@@ -267,7 +266,7 @@ class DataSet(TrainingProperty, StatisticsProperty):
     # returns copy of itself
     def copy(self): 
         new_ds = DataSet().from_object(self.matrix_, columns=self.columns_, dtypes=self.dtypes_)
-        super().copy(new_ds)
+        self.train_copy(new_ds)
         return new_ds
 
     # returns idx of first column named name
