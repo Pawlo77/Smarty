@@ -1,0 +1,420 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>smarty.datasets.training_properties &mdash; Smarty 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Smarty
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.datasets.html">smarty.datasets package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.preprocessing.html">smarty.preprocessing package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.config.html">smarty.config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.errors.html">smarty.errors module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Smarty</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>smarty.datasets.training_properties</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for smarty.datasets.training_properties</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">smarty.errors</span> <span class="kn">import</span> <span class="n">assertion</span>
+
+
+<div class="viewcode-block" id="TrainingProperty"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty">[docs]</a><span class="k">class</span> <span class="nc">TrainingProperty</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Training methods for a DataSet</span>
+<span class="sd">    </span>
+<span class="sd">    :var int batch_size\_: batch size</span>
+<span class="sd">    :var int | bool | np.inf repeat\_: how many times to repeat the dataset (False - do not repeat, np.inf will repeat forever)</span>
+<span class="sd">    :var bool | int shuffle\_: if False yielded batches will look the same, otherwise will be shuffled in buckets of size shuffle\_</span>
+<span class="sd">    :var bool drop_reminder\_: if True last batch of each full dataset iteration is dropped if it is not full</span>
+<span class="sd">    :var list target_classes\_: target classes that are yielded separately from data_classes\_ during training (for supervised algorithms)</span>
+<span class="sd">    :var list data_classes\_: data classes, if not set entire dataset is presumed to be consisted only from data_classes\_</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        It&#39;s recommended to set upper variables via proper methods (look below)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repeat_</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_reminder_</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># to navigate in _indices_ and to navigate from with data create indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_batch_idx_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_shuffle_idx_</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_row_num_</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># number of rows to be yield</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_indeces_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_classes_</span> <span class="o">=</span> <span class="kc">None</span>
+        
+    <span class="c1"># called by native DataSet copy, new - new DataSet object</span>
+<div class="viewcode-block" id="TrainingProperty.train_copy"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.train_copy">[docs]</a>    <span class="k">def</span> <span class="nf">train_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets new DataSet instance&#39;s traiing variables equal to its training variables</span>
+<span class="sd">        </span>
+<span class="sd">        :param DataSet new: new DataSet instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="s2">&quot;new is not a DataSet instance&quot;</span><span class="p">)</span>
+
+        <span class="n">new</span><span class="o">.</span><span class="n">batch_size_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">repeat_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeat_</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">shuffle_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">drop_reminder_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_reminder_</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">target_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">data_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_classes_</span></div>
+
+<div class="viewcode-block" id="TrainingProperty.steps_per_epoch_"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.steps_per_epoch_">[docs]</a>    <span class="k">def</span> <span class="nf">steps_per_epoch_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Number of steps per epoch - number of batches yileded at each compleate dataset iteration.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_reminder_</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TrainingProperty.batch"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.batch">[docs]</a>    <span class="k">def</span> <span class="nf">batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">drop_reminder</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;Batches dataset</span>
+<span class="sd">        </span>
+<span class="sd">        :param positive int batch_size: batch size</span>
+<span class="sd">        :param bool drop_reminder: weather or not to drop reminder</span>
+<span class="sd">        :returns: self</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">batch_size</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Batch size must be an positive integer&quot;</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">drop_reminder</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;Drop reminder must be a bool&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_reminder_</span> <span class="o">=</span> <span class="n">drop_reminder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="c1"># so it can be prepared in one line</span></div>
+
+<div class="viewcode-block" id="TrainingProperty.repeat"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.repeat">[docs]</a>    <span class="k">def</span> <span class="nf">repeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Repeats the dataset</span>
+
+<span class="sd">        :param bool | int opt: False - do not repeat (1 iteration), True - infinitive, int - how many times to repeat</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;Repeat must be a bool or integer&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">and</span> <span class="n">opt</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">repeat_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">repeat_</span> <span class="o">=</span> <span class="n">opt</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="TrainingProperty.shuffle"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.shuffle">[docs]</a>    <span class="k">def</span> <span class="nf">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Shuffles the datasets </span>
+
+<span class="sd">        :param bool | int opt: False - do not shuffle, int - shuffle box size</span>
+<span class="sd">        :param int seed: random seed for numpy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">opt</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;Shuffle must be an integer or boolean False&quot;</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s2">&quot;Seed must be an integer&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_</span> <span class="o">=</span> <span class="n">opt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed_</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="TrainingProperty.set_target_classes"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.set_target_classes">[docs]</a>    <span class="k">def</span> <span class="nf">set_target_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Allows to set the target classes for the dataset (supervised learning)</span>
+
+<span class="sd">        :param int | list | str key: column name (str), list of column names (list of strs), column index (int) or list of columns indexes (list of ints)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># single class by name</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span> <span class="c1"># single class by idx</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span> <span class="c1">#multiple class by names</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_classes_</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span> <span class="c1"># set rest column as data_classes_</span></div>
+
+<div class="viewcode-block" id="TrainingProperty.get_target_classes"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.get_target_classes">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: np.ndarray of columns being marked as target or an empty np.ndarray if there is no target</span>
+
+<span class="sd">        .. note:: </span>
+<span class="sd">            It presumes all categorical columns are preprocessed to numerical one, and try to cast output array to float to allow further computations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_common_dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TrainingProperty.get_data_classes"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.get_data_classes">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: np.ndarray of columns being marked as data or entire matrix\_ if no target column is selected</span>
+
+<span class="sd">        .. note:: </span>
+<span class="sd">            It presumes all categorical columns are preprocessed to numerical one, and try to cast output array to float to allow further computations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_common_dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_classes_</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_classes_</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TrainingProperty._get_common_dtype"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty._get_common_dtype">[docs]</a>    <span class="k">def</span> <span class="nf">_get_common_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Searches common dtype of selected data columns cols, it works under assumption that each of these columns is alredy numerical</span>
+
+<span class="sd">        :param int | list | str key: column name (str), list of column names (list of strs), column index (int) or list of columns indexes (list of ints)</span>
+<span class="sd">        :raturns: np.float32 or np.float64</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dtypes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+        <span class="n">largest</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dtypes</span><span class="p">),</span> <span class="n">key</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">dt</span><span class="p">:</span> <span class="n">dt</span><span class="o">.</span><span class="n">itemsize</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">largest</span><span class="o">.</span><span class="n">itemsize</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span></div>
+
+    <span class="k">def</span> <span class="nf">_generate_indeces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># recurent function to generate list of indeces of size indeces_size,</span>
+        <span class="c1"># starting with start_idx, where no index exceeds max_idx, and next </span>
+        <span class="c1"># overlaps (if they are neccesery) starts from 0</span>
+        <span class="k">def</span> <span class="nf">generate_helper</span><span class="p">(</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">max_idx</span><span class="p">,</span> <span class="n">indeces_size</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">indeces_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span>
+            
+            <span class="n">step_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_idx</span> <span class="o">-</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">indeces_size</span><span class="p">)</span>
+            <span class="n">step_indeces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="n">step_size</span><span class="p">)</span>
+
+            <span class="n">next_step_start_idx</span> <span class="o">=</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="n">step_size</span> <span class="k">if</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="n">step_size</span> <span class="o">&lt;</span> <span class="n">max_idx</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">next_step_indeces</span> <span class="o">=</span> <span class="n">generate_helper</span><span class="p">(</span><span class="n">next_step_start_idx</span><span class="p">,</span> <span class="n">max_idx</span><span class="p">,</span> <span class="n">indeces_size</span> <span class="o">-</span> <span class="n">step_size</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">next_step_indeces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">step_indeces</span><span class="p">,</span> <span class="n">next_step_indeces</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">step_indeces</span>
+
+        <span class="n">max_idx_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="c1"># number of rows in dataset</span>
+        <span class="n">indeces_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span> <span class="k">else</span> <span class="mi">1000</span> <span class="c1"># how large indeces we want to be</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_indeces_</span> <span class="o">=</span> <span class="n">generate_helper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_shuffle_idx_</span><span class="p">,</span> <span class="n">max_idx_</span><span class="p">,</span> <span class="n">indeces_size</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_shuffle_idx_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indeces_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_shuffle_idx_</span> <span class="o">==</span> <span class="n">max_idx_</span><span class="p">:</span> <span class="c1"># if out of row range - last generated idx is max_idx</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_start_shuffle_idx_</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># mark to start nex generating from 0</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_</span><span class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indeces_</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">next_epoch</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeat_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_row_num_</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># repeat dataset next time</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_row_num_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">repeat_</span> <span class="o">-=</span> <span class="mi">1</span> 
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeat_</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">StopIteration</span>
+
+        <span class="n">next_epoch</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_row_num_</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># if we still have some data to yield</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_row_num_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">size</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_reminder_</span><span class="p">:</span>
+                <span class="n">next_epoch</span><span class="p">()</span>
+
+            <span class="c1"># if sice exceedes remaining _incedes_</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_batch_idx_</span> <span class="o">+</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indeces_</span><span class="p">):</span>
+                <span class="n">idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indeces_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_batch_idx_</span><span class="p">:]</span> <span class="c1"># use remaining one</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_generate_indeces</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_start_batch_idx_</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span> <span class="c1"># how many we will take from next _indeces_</span>
+                <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">idxs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indeces_</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_batch_idx_</span><span class="p">]]</span> <span class="c1"># fill rest with new toss</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indeces_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_batch_idx_</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_batch_idx_</span> <span class="o">+</span> <span class="n">size</span><span class="p">]</span> <span class="c1"># fill all from the current toss</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_start_batch_idx_</span> <span class="o">+=</span> <span class="n">size</span> <span class="c1"># mark to start next iteration by size later</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_row_num_</span> <span class="o">-=</span> <span class="n">size</span> <span class="c1"># we used next size rows</span>
+            <span class="n">idxs</span> <span class="o">=</span> <span class="n">idxs</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># supervised learning</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[</span><span class="n">idxs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_classes_</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[</span><span class="n">idxs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c1"># unsupervised learning or not learning at all</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[</span><span class="n">idxs</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># we yielded everything we could</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_row_num_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_batch_idx_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_shuffle_idx_</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generate_indeces</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Pawel Pozorski.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

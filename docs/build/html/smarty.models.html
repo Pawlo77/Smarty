@@ -1,0 +1,626 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>smarty.models package &mdash; Smarty 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="smarty.preprocessing package" href="smarty.preprocessing.html" />
+    <link rel="prev" title="smarty.datasets package" href="smarty.datasets.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Smarty
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="smarty.datasets.html">smarty.datasets package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">smarty.models package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.api">smarty.models.api module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#smarty-models-dumb-module">smarty.models.dumb module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.linear">smarty.models.linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#smarty-models-metrics-module">smarty.models.metrics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.utils">smarty.models.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.preprocessing.html">smarty.preprocessing package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.config.html">smarty.config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.errors.html">smarty.errors module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Smarty</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>smarty.models package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/smarty.models.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="smarty-models-package">
+<h1>smarty.models package<a class="headerlink" href="#smarty-models-package" title="Permalink to this heading">¶</a></h1>
+<section id="module-smarty.models.api">
+<span id="smarty-models-api-module"></span><h2>smarty.models.api module<a class="headerlink" href="#module-smarty.models.api" title="Permalink to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="smarty.models.api.SAMPLINGS_METHODS">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.api.</span></span><span class="sig-name descname"><span class="pre">SAMPLINGS_METHODS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('train_test_split',</span> <span class="pre">'cross_val')</span></em><a class="headerlink" href="#smarty.models.api.SAMPLINGS_METHODS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Available samplings method for auto model evaluation</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.models.api.evaluate_model">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.api.</span></span><span class="sig-name descname"><span class="pre">evaluate_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric=&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_method='train_test_split'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/api.html#evaluate_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.api.evaluate_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits ds and trains the model according to sampling_method, than evaluates it also according to sampling_method</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source</p></li>
+<li><p><strong>model</strong> (<em>class</em>) – unfitted model, has to have .fit(), .predict(), .clean_copy() methods</p></li>
+<li><p><strong>metric</strong> (<em>function</em>) – evaluation mertic, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</p></li>
+<li><p><strong>sampling_method</strong> (<em>str</em>) – one of smarty.models.api.SAMPLINGS_METHODS</p></li>
+</ul>
+</dd>
+<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>additional params that will be passed to sampling function and model methods</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError if sampling_method not recognized</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>score or list of scores</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If drop_reminder not passed in kwargs, cross_val_split by default will drop last fold if not full</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="smarty-models-dumb-module">
+<h2>smarty.models.dumb module<a class="headerlink" href="#smarty-models-dumb-module" title="Permalink to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Dumb models does not support batching and doesn’t have .evaluate() method implemented</p>
+</div>
+<span class="target" id="module-smarty.models.dumb"></span><dl class="py data">
+<dt class="sig sig-object py" id="smarty.models.dumb.DUMB_SOLVERS">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.dumb.</span></span><span class="sig-name descname"><span class="pre">DUMB_SOLVERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('random',</span> <span class="pre">'zero')</span></em><a class="headerlink" href="#smarty.models.dumb.DUMB_SOLVERS" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>random</strong> (<em>str</em>) – model will return random value that it saw during .fit(), for classification only (or regression but it will return only seen targets)</p></li>
+<li><p><strong>zero</strong> (<em>str</em>) – model will return most common value for classification, mean / median value for regression</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.models.dumb.RandomModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.dumb.</span></span><span class="sig-name descname"><span class="pre">RandomModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/dumb.html#RandomModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.dumb.RandomModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>For each target column, returns random value from it, classification only</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.dumb.RandomModel.clean_copy">
+<span class="sig-name descname"><span class="pre">clean_copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/dumb.html#RandomModel.clean_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.dumb.RandomModel.clean_copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>new unfited model with same parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.dumb.RandomModel.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/dumb.html#RandomModel.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.dumb.RandomModel.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘Trains’ the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.dumb.RandomModel.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/dumb.html#RandomModel.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.dumb.RandomModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – seed for np.random.choice used by model</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D np.ndarray, where each culumn holds prediction for one of the targets</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError if model is not fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="smarty.models.dumb.ZERO_MODES">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.dumb.</span></span><span class="sig-name descname"><span class="pre">ZERO_MODES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('regression_mean',</span> <span class="pre">'regression_median',</span> <span class="pre">'classification')</span></em><a class="headerlink" href="#smarty.models.dumb.ZERO_MODES" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>regression_mean</strong> (<em>str</em>) – smarty.models.dumb.ZeroRuleModel will return mean value for each column</p></li>
+<li><p><strong>regression_median</strong> (<em>str</em>) – smarty.models.dumb.ZeroRuleModel will return meadian value for each column</p></li>
+<li><p><strong>classification</strong> (<em>str</em>) – smarty.models.dumb.ZeroRuleModel will return most common value for each column</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.models.dumb.ZeroRuleModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.dumb.</span></span><span class="sig-name descname"><span class="pre">ZeroRuleModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'classification'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/dumb.html#ZeroRuleModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.dumb.ZeroRuleModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>For each target column it returns predictions according to the rule defined by mode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>) – one of smarty.models.dumb.ZERO_MODES</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.dumb.ZeroRuleModel.clean_copy">
+<span class="sig-name descname"><span class="pre">clean_copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/dumb.html#ZeroRuleModel.clean_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.dumb.ZeroRuleModel.clean_copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>new unfited model with same parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.dumb.ZeroRuleModel.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/dumb.html#ZeroRuleModel.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.dumb.ZeroRuleModel.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘Trains’ the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.dumb.ZeroRuleModel.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/dumb.html#ZeroRuleModel.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.dumb.ZeroRuleModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – seed for np.random.choice used by model</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D np.ndarray, where each culumn holds prediction for one of the targets</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError if model is not fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.models.dumb.evaluate_dumb">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.dumb.</span></span><span class="sig-name descname"><span class="pre">evaluate_dumb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric=&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver='random'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/dumb.html#evaluate_dumb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.dumb.evaluate_dumb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut to evaluate_model that is “dumb”, choosen by string parameter mode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source</p></li>
+<li><p><strong>metric</strong> (<em>function</em>) – evaluation mertic, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</p></li>
+<li><p><strong>solver</strong> (<em>str</em>) – one of smarty.models.dumb.DUMB_SOLVERS</p></li>
+</ul>
+</dd>
+<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>additional params that will be passed to sampling function and model methods</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError if solver not recognized</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>score or list of scores</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For solver=zero you need to specify mode, by default it is classification, see smarty.models.dumb.ZERO_MODES</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-smarty.models.linear">
+<span id="smarty-models-linear-module"></span><h2>smarty.models.linear module<a class="headerlink" href="#module-smarty.models.linear" title="Permalink to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="smarty.models.linear.LINEAR_SOLVERS">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.linear.</span></span><span class="sig-name descname"><span class="pre">LINEAR_SOLVERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('sgd',</span> <span class="pre">'norm_eq')</span></em><a class="headerlink" href="#smarty.models.linear.LINEAR_SOLVERS" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sgd</strong> (<em>str</em>) – Stohastic Gradient Descent</p></li>
+<li><p><strong>norm_eq</strong> (<em>str</em>) – Normal Equation</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.models.linear.LinearRegression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.linear.</span></span><span class="sig-name descname"><span class="pre">LinearRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss=&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver='sgd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate=0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Linear model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</p></li>
+<li><p><strong>solver</strong> (<em>str</em>) – solver, one of smarty.models.linear.LINEAR_SOLVERS</p></li>
+<li><p><strong>learning_rate</strong> (<em>float</em>) – learning rate, used only for solver=”sgd”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>bias_</strong> (<em>np.ndarray</em>) – model’s bias term</p></li>
+<li><p><strong>coefs_</strong> (<em>np.ndarray</em>) – model’s coefficients</p></li>
+<li><p><strong>learning_rate_</strong> (<em>float</em>) – model’s learning rate</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.linear.LinearRegression.clean_copy">
+<span class="sig-name descname"><span class="pre">clean_copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression.clean_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression.clean_copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>new unfited model with same parameters</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.linear.LinearRegression.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates model on the ds according to loss and prints its score</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics. If not provided, loss given on model initialization will be used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>will be passed to .predict()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.linear.LinearRegression.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘Trains’ the model. If solver=”sgd”, number of epochs can be set via kwargs (defaults to epochs=10)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.linear.LinearRegression.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a 2D plot where x-axis is data_idx, and y-axis is target_idx. Plots both their value and prediction curve</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>data_idx</strong> (<em>int</em>) – data column index used as x-axis</p></li>
+</ul>
+</dd>
+<dt class="field-even">Para int target_class<span class="colon">:</span></dt>
+<dd class="field-even"><p>target class index used as y-axis (0 - first target class, 1 - second (if exists) and so on)</p>
+</dd>
+<dt class="field-odd">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-odd"><p>will be passed to .predict()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.linear.LinearRegression.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression.predict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D np.ndarray, where each culumn holds prediction for one of the targets</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError if model is not fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="smarty-models-metrics-module">
+<h2>smarty.models.metrics module<a class="headerlink" href="#smarty-models-metrics-module" title="Permalink to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each metric from there requires both y and y_pred as np.ndarray and returns calculated score</p>
+</div>
+<span class="target" id="module-smarty.models.metrics"></span><dl class="py function">
+<dt class="sig sig-object py" id="smarty.models.metrics.accuracy">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.metrics.</span></span><span class="sig-name descname"><span class="pre">accuracy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/metrics.html#accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.metrics.accuracy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accuracy score</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.models.metrics.confusion_matrix">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.metrics.</span></span><span class="sig-name descname"><span class="pre">confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/metrics.html#confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.metrics.confusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates confusion matrix based on y and y_pred and returns it</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>return_classes</strong> (<em>bool</em>) – wheather or not to return class names</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>conf_matrix if return_classes=False, otherwise (conf_matrix, classes)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.models.metrics.f1_score">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.metrics.</span></span><span class="sig-name descname"><span class="pre">f1_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/metrics.html#f1_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.metrics.f1_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>F1 score, only for binary classifier</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.models.metrics.mean_squared_error">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.metrics.</span></span><span class="sig-name descname"><span class="pre">mean_squared_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/metrics.html#mean_squared_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.metrics.mean_squared_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean squared error score</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.models.metrics.precision">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.metrics.</span></span><span class="sig-name descname"><span class="pre">precision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/metrics.html#precision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.metrics.precision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Precision score, only for binary classifier</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.models.metrics.r_squared">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.metrics.</span></span><span class="sig-name descname"><span class="pre">r_squared</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/metrics.html#r_squared"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.metrics.r_squared" title="Permalink to this definition">¶</a></dt>
+<dd><p>R squared score</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.models.metrics.recall">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.metrics.</span></span><span class="sig-name descname"><span class="pre">recall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/metrics.html#recall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.metrics.recall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recall score, only for binary classifier</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.models.metrics.root_mean_squared_error">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.metrics.</span></span><span class="sig-name descname"><span class="pre">root_mean_squared_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/metrics.html#root_mean_squared_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.metrics.root_mean_squared_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Root mean squared error score</p>
+</dd></dl>
+
+</section>
+<section id="module-smarty.models.utils">
+<span id="smarty-models-utils-module"></span><h2>smarty.models.utils module<a class="headerlink" href="#module-smarty.models.utils" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.models.utils.display_conf">
+<span class="sig-prename descclassname"><span class="pre">smarty.models.utils.</span></span><span class="sig-name descname"><span class="pre">display_conf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/utils.html#display_conf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.utils.display_conf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays the calculated confusion matrix conf</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>conf</strong> (<em>list of lists</em><em> | </em><em>2D np.ndarray</em>) – the confusion matrix</p></li>
+<li><p><strong>classes</strong> (<em>list</em><em> | </em><em>1D np.ndarray</em>) – classes names, where ith name is linked to ith column of confusion matrix</p></li>
+<li><p><strong>display_names</strong> (<em>bool</em>) – whether to display names provided in classes</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="smarty.preprocessing.html" class="btn btn-neutral float-right" title="smarty.preprocessing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="smarty.datasets.html" class="btn btn-neutral float-left" title="smarty.datasets package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Pawel Pozorski.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

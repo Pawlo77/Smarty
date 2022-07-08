@@ -1,0 +1,7 @@
+smarty
+======
+
+.. toctree::
+   :maxdepth: 4
+
+   .smarty

@@ -1,0 +1,756 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>smarty.datasets package &mdash; Smarty 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="smarty.models package" href="smarty.models.html" />
+    <link rel="prev" title="Welcome to Smarty’s!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Smarty
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">smarty.datasets package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#smarty-datasets-datasets-module">smarty.datasets.datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-smarty.datasets.stats_properties">smarty.datasets.stats_properties module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-smarty.datasets.training_properties">smarty.datasets.training_properties module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-smarty.datasets.utils">smarty.datasets.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.preprocessing.html">smarty.preprocessing package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.config.html">smarty.config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.errors.html">smarty.errors module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Smarty</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>smarty.datasets package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/smarty.datasets.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="smarty-datasets-package">
+<h1>smarty.datasets package<a class="headerlink" href="#smarty-datasets-package" title="Permalink to this heading">¶</a></h1>
+<p>Responsible for holding and administrating the data: loading it into memory, maintaining its index and types, sending it to models.</p>
+<section id="smarty-datasets-datasets-module">
+<h2>smarty.datasets.datasets module<a class="headerlink" href="#smarty-datasets-datasets-module" title="Permalink to this heading">¶</a></h2>
+<p>Holds baisc DataSet instance with all methods administrating its index and types. To see advanced methods inspect smarty.datasets.*prosperties</p>
+<span class="target" id="module-smarty.datasets.datasets"></span><dl class="py class">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.datasets.datasets.</span></span><span class="sig-name descname"><span class="pre">DataSet</span></span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smarty.datasets.training_properties.TrainingProperty" title="smarty.datasets.training_properties.TrainingProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainingProperty</span></code></a>, <a class="reference internal" href="#smarty.datasets.stats_properties.StatisticsProperty" title="smarty.datasets.stats_properties.StatisticsProperty"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatisticsProperty</span></code></a></p>
+<p>Object holding the accual data, allowing to name its columns and choose their dtypes. It’s data can be set and accessed via [] (like python’s list) - see below example</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>matrix_</strong> (<em>np.ndarray</em>) – array holidng the data (columns - its 1 axis), preferable to get it via .numpy() method</p></li>
+<li><p><strong>columns_</strong> (<em>np.ndarray</em>) – at each position i holds name of ith column of the dataset (if not provided smallest not used number will be picked for name)</p></li>
+<li><p><strong>dtypes_</strong> (<em>np.ndarray</em>) – at each position i holds dtype of ith column of the dataset</p></li>
+<li><p><strong>dummy_writer</strong> – allows to write columns to the dataset without changing their dtype, ex:</p></li>
+</ul>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kn">from</span> <span class="nn">smarty.datasets</span> <span class="kn">import</span> <span class="n">load_data</span>
+<span class="linenos"> 2</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="n">ds</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="s2">&quot;iris.txt&quot;</span><span class="p">)</span>
+<span class="linenos"> 5</span><span class="c1"># here ds[&quot;species&quot;] will remain as dtype U, not uint8</span>
+<span class="linenos"> 6</span><span class="k">with</span> <span class="n">ds</span><span class="o">.</span><span class="n">dummy_writer</span><span class="p">:</span>
+<span class="linenos"> 7</span>    <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;species&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">150</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># overwrite entire &quot;species&quot; column</span>
+<span class="linenos"> 8</span>
+<span class="linenos"> 9</span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;petal_length&quot;</span><span class="p">])</span> <span class="c1"># 11th row of PentalLength column</span>
+<span class="linenos">10</span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># entire 2nd column</span>
+<span class="linenos">11</span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="p">:])</span> <span class="c1"># entire 12th row</span>
+<span class="linenos">12</span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span> <span class="c1"># 4th column, 13th row</span>
+<span class="linenos">13</span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;sepal_width&quot;</span><span class="p">])</span> <span class="c1"># entire SepalWidth column</span>
+<span class="linenos">14</span><span class="n">ds</span><span class="p">[</span><span class="mi">41</span><span class="p">,</span> <span class="s2">&quot;sepal_width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.3</span> <span class="c1"># set 42th row of &quot;sepal_width&quot; column to 2.3</span>
+<span class="linenos">15</span><span class="n">ds</span><span class="p">[</span><span class="mi">36</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.7</span> <span class="c1"># set 37th row of 4th column to 1.7</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet._get_idx">
+<span class="sig-name descname"><span class="pre">_get_idx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet._get_idx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet._get_idx" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – name of column to be searched</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>index of first column named name</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError if column named name is not found in the dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet._is_categorical">
+<span class="sig-name descname"><span class="pre">_is_categorical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet._is_categorical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet._is_categorical" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>idx</strong> (<em>int</em>) – column index</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if column with index idx is categorical, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.add_c">
+<span class="sig-name descname"><span class="pre">add_c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.add_c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.add_c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds column/s to a dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> (<em>list</em><em> | </em><em>np.ndarray</em>) – list or 1D np.ndarray for one column, list of list or 2D np.ndarray for multiple columns to be added</p></li>
+<li><p><strong>columns</strong> (<em>list of str</em><em> | </em><em>None</em>) – list - name for each column in c or None (auto naming with lowest possible number)</p></li>
+<li><p><strong>dtypes</strong> (<em>list</em><em> | </em><em>None</em><em> | </em><em>any dtype</em>) – None for auto dtype detection, any dtype that will be used for all columns in c, list of dtypes - one for each column in c</p></li>
+<li><p><strong>pos</strong> (<em>int</em><em> | </em><em>list</em><em> | </em><em>np.ndarray</em>) – position where to put new rows. <strong>*defaults to -1* - works like append</strong>, int to insert rows as one block, list of ints - for each row its desired location</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>providing dtypes=None with disabled auto dtype detection will cause usage of dtype choosen by numpy (in case of fed in list) or same as in fed in np.ndarray</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.add_r">
+<span class="sig-name descname"><span class="pre">add_r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.add_r"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.add_r" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds row/s to a dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>list</em><em> | </em><em>np.ndarray</em>) – list or 1D np.ndarray for one row, list of list or 2D np.ndarray for multiple rows to be added</p></li>
+<li><p><strong>pos</strong> (<em>int</em><em> | </em><em>list</em><em> | </em><em>np.ndarray</em>) – position where to put new rows. <strong>*defaults to -1* - works like append</strong>, int to insert rows as one block, list of ints - for each row its desired location</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Each row must be same length as number of columns in the dataset. DataSet will try to cast each value in the row to corresponding column’s dtype, which might change “0001” to 1 or cause an error (ex trying to case “tree” to uin8)</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.categorical_idxs_">
+<span class="sig-name descname"><span class="pre">categorical_idxs_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.categorical_idxs_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.categorical_idxs_" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of indexes of categorical columns in the dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>copy of self (maintaining all training prosperties as well, ex batch_size)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.drop_c">
+<span class="sig-name descname"><span class="pre">drop_c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.drop_c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.drop_c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes columns from DataSet and returns them as new DataSet instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em><em> | </em><em>list</em><em> | </em><em>int</em>) – column name (str), list of column names (list of strs), column index (int) or list of columns indexes (list of ints)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p>AssertionError if key is not valid</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.drop_r">
+<span class="sig-name descname"><span class="pre">drop_r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.drop_r"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.drop_r" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes rows from dataset and returns them as new DataSet instance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>int</em><em> | </em><em>list</em>) – row idx or list of rows indexes (list of ints)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p>AssertionError if key is not valid</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.empty_">
+<span class="sig-name descname"><span class="pre">empty_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.empty_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.empty_" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean indicating whether the dataset is empty.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.from_object">
+<span class="sig-name descname"><span class="pre">from_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.from_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.from_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates and returns DataSet object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>matrix</strong> (<em>np.ndarray</em><em> | </em><em>2D nested list</em>) – matrix containing the data</p></li>
+<li><p><strong>columns</strong> (<em>np.ndarray</em><em> | </em><em>list</em>) – list containing column name for each column in the matrix (not required)</p></li>
+<li><p><strong>dtypes</strong> (<em>np.ndarray</em><em> | </em><em>list</em><em> | </em><em>dtype</em>) – list containing dtype name for each column in the matrix (not required) or one single dtype (like str) that will be used for all columns</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p>AssertionError if matrix is empty</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.get_catedorical">
+<span class="sig-name descname"><span class="pre">get_catedorical</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.get_catedorical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.get_catedorical" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray holding all dataset’s categorical columns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.get_numerical">
+<span class="sig-name descname"><span class="pre">get_numerical</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.get_numerical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.get_numerical" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray holding all dataset’s numerical columns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.get_shape_">
+<span class="sig-name descname"><span class="pre">get_shape_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.get_shape_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.get_shape_" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matrix_ shape if it is not empty else (0, )</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.join">
+<span class="sig-name descname"><span class="pre">join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joins DataSet dt to itself</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pos</strong> (<em>int</em><em> | </em><em>list</em><em> | </em><em>np.ndarray</em>) – position where to put new rows. <strong>*defaults to -1* - works like append</strong>, int to insert rows as one block, list of ints - for each row its desired location</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – 1 for column-wise join, 0 for row-wise join</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.numerical_idxs_">
+<span class="sig-name descname"><span class="pre">numerical_idxs_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.numerical_idxs_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.numerical_idxs_" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of indexes of numerical columns in the dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.DataSet.numpy">
+<span class="sig-name descname"><span class="pre">numpy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/datasets.html#DataSet.numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.datasets.DataSet.numpy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataSet pure data (underlying matrix - np.ndarray)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.FLOAT_TYPES">
+<span class="sig-prename descclassname"><span class="pre">smarty.datasets.datasets.</span></span><span class="sig-name descname"><span class="pre">FLOAT_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'numpy.float16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float64'&gt;)</span></em><a class="headerlink" href="#smarty.datasets.datasets.FLOAT_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of float dtypes auto-detection will check, each one being a native np.dtype</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="smarty.datasets.datasets.INT_TYPES">
+<span class="sig-prename descclassname"><span class="pre">smarty.datasets.datasets.</span></span><span class="sig-name descname"><span class="pre">INT_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'numpy.uint8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.uint64'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int8'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int16'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int32'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.int64'&gt;)</span></em><a class="headerlink" href="#smarty.datasets.datasets.INT_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of int dtypes auto-detection will check, each one being a native np.dtype</p>
+</dd></dl>
+
+</section>
+<section id="module-smarty.datasets.stats_properties">
+<span id="smarty-datasets-stats-properties-module"></span><h2>smarty.datasets.stats_properties module<a class="headerlink" href="#module-smarty.datasets.stats_properties" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.datasets.stats_properties.StatisticsProperty">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.datasets.stats_properties.</span></span><span class="sig-name descname"><span class="pre">StatisticsProperty</span></span><a class="reference internal" href="_modules/smarty/datasets/stats_properties.html#StatisticsProperty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.stats_properties.StatisticsProperty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Statistics methods for a DataSet</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.stats_properties.StatisticsProperty.descr_cat">
+<span class="sig-name descname"><span class="pre">descr_cat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/stats_properties.html#StatisticsProperty.descr_cat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.stats_properties.StatisticsProperty.descr_cat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints statistical data about categorical columns of the dataset (if it is not empty, else prints ‘DataSet is empty’), like</p>
+<ol class="arabic simple">
+<li><p>count of non-nan entires</p></li>
+<li><p>number of unique entries (empty entry is also counted as type of entry)</p></li>
+<li><p>entries frequency</p></li>
+<li><p>up to k most frequent items for each column</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>k</strong> (<em>int</em>) – number of unique entries to display</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.stats_properties.StatisticsProperty.descr_num">
+<span class="sig-name descname"><span class="pre">descr_num</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/stats_properties.html#StatisticsProperty.descr_num"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.stats_properties.StatisticsProperty.descr_num" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints statistical data about numerical columns of the dataset (if it is not empty, else prints ‘DataSet is empty’), like</p>
+<ol class="arabic simple">
+<li><p>count of non-nan entires</p></li>
+<li><p>mean value</p></li>
+<li><p>standard deviation</p></li>
+<li><p>minimum value, 25, 50, 75th percentile, maximum value</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.stats_properties.StatisticsProperty.fill_nan">
+<span class="sig-name descname"><span class="pre">fill_nan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/stats_properties.html#StatisticsProperty.fill_nan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.stats_properties.StatisticsProperty.fill_nan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fils empty cells in the cols according to choosen strategy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em><em> | </em><em>list</em><em> | </em><em>int</em>) – column name (str), list of column names (list of strs), column index (int) or list of columns indexes (list of ints)</p></li>
+<li><p><strong>strategy</strong> (<em>int</em><em> | </em><em>str</em>) – mean - fill with mean value from column, median - same as mean, remove - removes rows with empty cells, othweriwse will put value of strategy to empty cells</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p>AssertionError if key is not valid</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataSet of dropped rows (if any)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.stats_properties.StatisticsProperty.head">
+<span class="sig-name descname"><span class="pre">head</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/stats_properties.html#StatisticsProperty.head"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.stats_properties.StatisticsProperty.head" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints up to num first row of matrix_, or if dataset is empty prints ‘DataSet is empty’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num</strong> (<em>int</em>) – how many rows to print</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.stats_properties.StatisticsProperty.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/stats_properties.html#StatisticsProperty.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.stats_properties.StatisticsProperty.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays basic information about the dataset, like number of rows, columns, columns names and dtypes</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-smarty.datasets.training_properties">
+<span id="smarty-datasets-training-properties-module"></span><h2>smarty.datasets.training_properties module<a class="headerlink" href="#module-smarty.datasets.training_properties" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.datasets.training_properties.TrainingProperty">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.datasets.training_properties.</span></span><span class="sig-name descname"><span class="pre">TrainingProperty</span></span><a class="reference internal" href="_modules/smarty/datasets/training_properties.html#TrainingProperty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.training_properties.TrainingProperty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Training methods for a DataSet</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size_</strong> (<em>int</em>) – batch size</p></li>
+<li><p><strong>repeat_</strong> (<em>int</em><em> | </em><em>bool</em><em> | </em><em>np.inf</em>) – how many times to repeat the dataset (False - do not repeat, np.inf will repeat forever)</p></li>
+<li><p><strong>shuffle_</strong> (<em>bool</em><em> | </em><em>int</em>) – if False yielded batches will look the same, otherwise will be shuffled in buckets of size shuffle_</p></li>
+<li><p><strong>drop_reminder_</strong> (<em>bool</em>) – if True last batch of each full dataset iteration is dropped if it is not full</p></li>
+<li><p><strong>target_classes_</strong> (<em>list</em>) – target classes that are yielded separately from data_classes_ during training (for supervised algorithms)</p></li>
+<li><p><strong>data_classes_</strong> (<em>list</em>) – data classes, if not set entire dataset is presumed to be consisted only from data_classes_</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It’s recommended to set upper variables via proper methods (look below)</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.training_properties.TrainingProperty._get_common_dtype">
+<span class="sig-name descname"><span class="pre">_get_common_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/training_properties.html#TrainingProperty._get_common_dtype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.training_properties.TrainingProperty._get_common_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Searches common dtype of selected data columns cols, it works under assumption that each of these columns is alredy numerical</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>int</em><em> | </em><em>list</em><em> | </em><em>str</em>) – column name (str), list of column names (list of strs), column index (int) or list of columns indexes (list of ints)</p>
+</dd>
+<dt class="field-even">Raturns<span class="colon">:</span></dt>
+<dd class="field-even"><p>np.float32 or np.float64</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.training_properties.TrainingProperty.batch">
+<span class="sig-name descname"><span class="pre">batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_reminder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/training_properties.html#TrainingProperty.batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.training_properties.TrainingProperty.batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batches dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size</strong> (<em>positive int</em>) – batch size</p></li>
+<li><p><strong>drop_reminder</strong> (<em>bool</em>) – weather or not to drop reminder</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.training_properties.TrainingProperty.get_data_classes">
+<span class="sig-name descname"><span class="pre">get_data_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/training_properties.html#TrainingProperty.get_data_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.training_properties.TrainingProperty.get_data_classes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray of columns being marked as data or entire matrix_ if no target column is selected</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It presumes all categorical columns are preprocessed to numerical one, and try to cast output array to float to allow further computations</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.training_properties.TrainingProperty.get_target_classes">
+<span class="sig-name descname"><span class="pre">get_target_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/training_properties.html#TrainingProperty.get_target_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.training_properties.TrainingProperty.get_target_classes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray of columns being marked as target or an empty np.ndarray if there is no target</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It presumes all categorical columns are preprocessed to numerical one, and try to cast output array to float to allow further computations</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.training_properties.TrainingProperty.repeat">
+<span class="sig-name descname"><span class="pre">repeat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/training_properties.html#TrainingProperty.repeat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.training_properties.TrainingProperty.repeat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repeats the dataset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>opt</strong> (<em>bool</em><em> | </em><em>int</em>) – False - do not repeat (1 iteration), True - infinitive, int - how many times to repeat</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.training_properties.TrainingProperty.set_target_classes">
+<span class="sig-name descname"><span class="pre">set_target_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/training_properties.html#TrainingProperty.set_target_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.training_properties.TrainingProperty.set_target_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allows to set the target classes for the dataset (supervised learning)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>int</em><em> | </em><em>list</em><em> | </em><em>str</em>) – column name (str), list of column names (list of strs), column index (int) or list of columns indexes (list of ints)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.training_properties.TrainingProperty.shuffle">
+<span class="sig-name descname"><span class="pre">shuffle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">opt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/training_properties.html#TrainingProperty.shuffle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.training_properties.TrainingProperty.shuffle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shuffles the datasets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opt</strong> (<em>bool</em><em> | </em><em>int</em>) – False - do not shuffle, int - shuffle box size</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – random seed for numpy</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.training_properties.TrainingProperty.steps_per_epoch_">
+<span class="sig-name descname"><span class="pre">steps_per_epoch_</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/training_properties.html#TrainingProperty.steps_per_epoch_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.training_properties.TrainingProperty.steps_per_epoch_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of steps per epoch - number of batches yileded at each compleate dataset iteration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.datasets.training_properties.TrainingProperty.train_copy">
+<span class="sig-name descname"><span class="pre">train_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/training_properties.html#TrainingProperty.train_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.training_properties.TrainingProperty.train_copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets new DataSet instance’s traiing variables equal to its training variables</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new</strong> (<a class="reference internal" href="#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – new DataSet instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-smarty.datasets.utils">
+<span id="smarty-datasets-utils-module"></span><h2>smarty.datasets.utils module<a class="headerlink" href="#module-smarty.datasets.utils" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.datasets.utils.cross_val_split">
+<span class="sig-prename descclassname"><span class="pre">smarty.datasets.utils.</span></span><span class="sig-name descname"><span class="pre">cross_val_split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_reminder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/utils.html#cross_val_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.utils.cross_val_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits ds into folds seperate DataSets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a><em> | </em><em>np.ndarray</em>) – a DataSet to be splited</p></li>
+<li><p><strong>folds</strong> (<em>int &gt;= 2</em>) – how many folds to be created, has to be smaller than number of rows in the ds</p></li>
+<li><p><strong>shuffle</strong> (<em>bool</em>) – if True random rows are being shuffled, False - first fold uses n first rows, second n to 2n etc</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – random seed for numpy (used only with shuffle=True)</p></li>
+<li><p><strong>drop_reminder</strong> (<em>bool</em>) – if True last fold is skipped if not full</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of DataSets, each one being seperate fold</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.datasets.utils.load_data">
+<span class="sig-prename descclassname"><span class="pre">smarty.datasets.utils.</span></span><span class="sig-name descname"><span class="pre">load_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/utils.html#load_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.utils.load_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads data from given source and returns a DataSet object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em> | </em><em>Path</em>) – filename / path to source file</p></li>
+<li><p><strong>url</strong> (<em>str</em>) – direct link to source file, note: file should be open to downloads without any logins or captcha</p></li>
+<li><p><strong>header</strong> (<em>bool</em>) – True - furst line of file will be treated as header (columns names will be generated based on it)</p></li>
+<li><p><strong>sep</strong> (<em>str</em>) – seperator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p>AssertionError if no source provided</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="smarty.datasets.utils.train_test_split">
+<span class="sig-prename descclassname"><span class="pre">smarty.datasets.utils.</span></span><span class="sig-name descname"><span class="pre">train_test_split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/datasets/utils.html#train_test_split"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.datasets.utils.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits ds into 2 seperate DataSets - one for training and one for testing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a><em> | </em><em>np.ndarray</em>) – a DataSet to be splited</p></li>
+<li><p><strong>split_ratio</strong> (<em>float between</em><em> (</em><em>0.0</em><em>, </em><em>1.0</em><em>)</em>) – the split ratio (how many of the ds is to be put to a training set)</p></li>
+<li><p><strong>shuffle</strong> (<em>bool</em>) – if True random rows are being shuffled, False - first split_ratio * 100% of the ds will be put in the training set</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – random seed for numpy (used only with shuffle=True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>training_ds, test_ds (both instances of DataSet)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="smarty.models.html" class="btn btn-neutral float-right" title="smarty.models package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Smarty’s!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Pawel Pozorski.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,667 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>smarty.datasets.datasets &mdash; Smarty 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Smarty
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.datasets.html">smarty.datasets package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.preprocessing.html">smarty.preprocessing package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.config.html">smarty.config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.errors.html">smarty.errors module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Smarty</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>smarty.datasets.datasets</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for smarty.datasets.datasets</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">smarty.errors</span> <span class="kn">import</span> <span class="n">assertion</span>
+<span class="kn">from</span> <span class="nn">smarty.config</span> <span class="kn">import</span> <span class="n">get_config</span><span class="p">,</span> <span class="n">set_config</span>
+<span class="kn">from</span> <span class="nn">.training_properties</span> <span class="kn">import</span> <span class="n">TrainingProperty</span>
+<span class="kn">from</span> <span class="nn">.stats_properties</span> <span class="kn">import</span> <span class="n">StatisticsProperty</span>
+
+
+<span class="n">INT_TYPES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;List of int dtypes auto-detection will check, each one being a native np.dtype&quot;&quot;&quot;</span>
+
+<span class="n">FLOAT_TYPES</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;List of float dtypes auto-detection will check, each one being a native np.dtype&quot;&quot;&quot;</span>
+
+
+<span class="c1"># helper class for DataSet</span>
+<span class="k">class</span> <span class="nc">DataCol</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">col</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">col</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># fill empty cells</span>
+            <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># if any dtype passed </span>
+                <span class="k">return</span> <span class="n">col</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">get_config</span><span class="p">(</span><span class="s2">&quot;_AUTO_DETECTION&quot;</span><span class="p">):</span> <span class="c1"># if auto detection is enabled</span>
+                <span class="k">return</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">_find_type</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">col</span>
+
+        <span class="n">col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+        <span class="n">col</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">col</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># fill empty cells</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">col</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span> <span class="c1"># convert to np.ndarray with specified dtype</span>
+        <span class="k">return</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">_find_type</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="c1"># convert to np.ndarray and find dtype</span>
+
+    <span class="k">def</span> <span class="nf">_find_type</span><span class="p">(</span><span class="n">col</span><span class="p">):</span> <span class="c1"># note: it doesn&#39;t check if float precision meet, for floats preferable to do it alone</span>
+        <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">info</span><span class="o">.</span><span class="n">min</span> <span class="o">&lt;=</span> <span class="n">min_</span> <span class="ow">and</span> <span class="n">info</span><span class="o">.</span><span class="n">max</span> <span class="o">&gt;=</span> <span class="n">max_</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;f8&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span> <span class="c1"># it&#39;s not numerical, keep what numpy picked</span>
+            <span class="k">return</span> <span class="n">col</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">col</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+            <span class="n">assertion</span><span class="p">(</span><span class="n">min_</span> <span class="o">!=</span> <span class="s2">&quot;nan&quot;</span> <span class="ow">and</span> <span class="n">max_</span> <span class="o">!=</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="s2">&quot;Entire column empty&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">col</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span> <span class="c1"># if integer</span>
+                <span class="k">for</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">INT_TYPES</span><span class="p">:</span>
+                    <span class="n">info</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">check</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">):</span> <span class="c1"># if in defined range</span>
+                        <span class="k">return</span> <span class="n">col</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">FLOAT_TYPES</span><span class="p">:</span> <span class="c1"># float</span>
+                    <span class="n">info</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">check</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">):</span> <span class="c1"># if in defined range</span>
+                        <span class="k">return</span> <span class="n">col</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span> 
+
+
+<span class="c1"># allows to use DataCol without auto-dtype detecion</span>
+<span class="k">class</span> <span class="nc">DummyWriter</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span> <span class="c1"># turn off auto dtype detection on entry</span>
+        <span class="n">set_config</span><span class="p">(</span><span class="s2">&quot;_AUTO_DETECTION&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span> <span class="c1"># turn on auto dtype detection on exit</span>
+        <span class="n">set_config</span><span class="p">(</span><span class="s2">&quot;_AUTO_DETECTION&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DataSet"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet">[docs]</a><span class="k">class</span> <span class="nc">DataSet</span><span class="p">(</span><span class="n">TrainingProperty</span><span class="p">,</span> <span class="n">StatisticsProperty</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Object holding the accual data, allowing to name its columns and choose their dtypes. It&#39;s data can be set and accessed via [] (like python&#39;s list) - see below example</span>
+
+<span class="sd">    :var np.ndarray matrix\_: array holidng the data (columns - its 1 axis), preferable to get it via .numpy() method</span>
+<span class="sd">    :var np.ndarray columns\_: at each position i holds name of ith column of the dataset (if not provided smallest not used number will be picked for name)</span>
+<span class="sd">    :var np.ndarray dtypes\_: at each position i holds dtype of ith column of the dataset</span>
+<span class="sd">    :var dummy_writer: allows to write columns to the dataset without changing their dtype, ex:</span>
+
+<span class="sd">    .. code-block:: python</span>
+<span class="sd">        :linenos:</span>
+<span class="sd">    </span>
+<span class="sd">        from smarty.datasets import load_data</span>
+<span class="sd">        import numpy as np</span>
+
+<span class="sd">        ds = load_data(&quot;iris.txt&quot;)</span>
+<span class="sd">        # here ds[&quot;species&quot;] will remain as dtype U, not uint8</span>
+<span class="sd">        with ds.dummy_writer:</span>
+<span class="sd">            ds[&quot;species&quot;] = np.ones((150, 1)) # overwrite entire &quot;species&quot; column</span>
+
+<span class="sd">        print(ds[10, &quot;petal_length&quot;]) # 11th row of PentalLength column</span>
+<span class="sd">        print(ds[1]) # entire 2nd column</span>
+<span class="sd">        print(ds[11, :]) # entire 12th row</span>
+<span class="sd">        print(ds[12, 3]) # 4th column, 13th row</span>
+<span class="sd">        print(ds[&quot;sepal_width&quot;]) # entire SepalWidth column</span>
+<span class="sd">        ds[41, &quot;sepal_width&quot;] = 2.3 # set 42th row of &quot;sepal_width&quot; column to 2.3</span>
+<span class="sd">        ds[36, 3] = 1.7 # set 37th row of 4th column to 1.7</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns_</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># to hold column names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="c1"># turn on/off auto dtype detection by calling with ds.dummy_writer: ...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dummy_writer</span> <span class="o">=</span> <span class="n">DummyWriter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> 
+
+<div class="viewcode-block" id="DataSet.get_shape_"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.get_shape_">[docs]</a>    <span class="k">def</span> <span class="nf">get_shape_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: matrix\_ shape if it is not empty else (0, )</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="o">.</span><span class="n">shape</span></div>
+
+<div class="viewcode-block" id="DataSet.categorical_idxs_"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.categorical_idxs_">[docs]</a>    <span class="k">def</span> <span class="nf">categorical_idxs_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: list of indexes of categorical columns in the dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_categorical</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                <span class="n">idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">idxs</span></div>
+
+<div class="viewcode-block" id="DataSet.numerical_idxs_"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.numerical_idxs_">[docs]</a>    <span class="k">def</span> <span class="nf">numerical_idxs_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: list of indexes of numerical columns in the dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_categorical</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+                <span class="n">idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">idxs</span></div>
+
+<div class="viewcode-block" id="DataSet.empty_"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.empty_">[docs]</a>    <span class="k">def</span> <span class="nf">empty_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: boolean indicating whether the dataset is empty.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataSet.get_catedorical"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.get_catedorical">[docs]</a>    <span class="k">def</span> <span class="nf">get_catedorical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: np.ndarray holding all dataset&#39;s categorical columns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_idxs_</span><span class="p">()]</span></div>
+
+<div class="viewcode-block" id="DataSet.get_numerical"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.get_numerical">[docs]</a>    <span class="k">def</span> <span class="nf">get_numerical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        :returns: np.ndarray holding all dataset&#39;s numerical columns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">numerical_idxs_</span><span class="p">()]</span></div>
+    
+    <span class="c1"># accepts a 2D np.ndarray or a 2D nested python list</span>
+    <span class="c1"># dtypes - one for entire matrix or none (auto-detecion) or one for each column</span>
+    <span class="c1"># columns - names for all columns or none (auto-naming)</span>
+<div class="viewcode-block" id="DataSet.from_object"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.from_object">[docs]</a>    <span class="k">def</span> <span class="nf">from_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[],</span> <span class="n">dtypes</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Creates and returns DataSet object</span>
+<span class="sd">        </span>
+<span class="sd">        :param np.ndarray | 2D nested list matrix: matrix containing the data</span>
+<span class="sd">        :param np.ndarray | list columns: list containing column name for each column in the matrix (not required)</span>
+<span class="sd">        :param np.ndarray | list | dtype dtypes: list containing dtype name for each column in the matrix (not required) or one single dtype (like str) that will be used for all columns</span>
+<span class="sd">        :raises: AssertionError if matrix is empty</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if one dtype provided for entire array</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtypes</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtypes</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">dtypes</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;Wrong data format provided&quot;</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Empty sequence.&quot;</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dtypes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">dtypes</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s2">&quot;Dtypes don&#39;t match number of columns in matrix.&quot;</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s2">&quot;Columns don&#39;t match number of columns in matrix&#39;&quot;</span><span class="p">)</span>
+
+        <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">dtypes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dtypes</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">matrix</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">))],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="n">matrix</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;U32&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="DataSet.numpy"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.numpy">[docs]</a>    <span class="k">def</span> <span class="nf">numpy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: DataSet pure data (underlying matrix - np.ndarray)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span></div>
+
+<div class="viewcode-block" id="DataSet.drop_c"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.drop_c">[docs]</a>    <span class="k">def</span> <span class="nf">drop_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes columns from DataSet and returns them as new DataSet instance</span>
+
+<span class="sd">        :param str | list | int key: column name (str), list of column names (list of strs), column index (int) or list of columns indexes (list of ints)</span>
+<span class="sd">        :raises: AssertionError if key is not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># single column by name</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># multiple columns by names</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">slice</span><span class="p">,</span> <span class="s2">&quot;Wrong column specifier&quot;</span><span class="p">)</span>
+
+        <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[:,</span> <span class="n">key</span><span class="p">]</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="c1"># if it was a single column</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">]</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">DataSet</span><span class="p">()</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">=</span><span class="n">d</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="DataSet.drop_r"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.drop_r">[docs]</a>    <span class="k">def</span> <span class="nf">drop_r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes rows from dataset and returns them as new DataSet instance</span>
+<span class="sd">        </span>
+<span class="sd">        :param int | list key: row idx or list of rows indexes (list of ints)</span>
+<span class="sd">        :raises: AssertionError if key is not valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">slice</span><span class="p">,</span> <span class="s2">&quot;Wrong row specifier&quot;</span><span class="p">)</span>
+
+        <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[</span><span class="n">key</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataSet</span><span class="p">()</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataSet.add_c"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.add_c">[docs]</a>    <span class="k">def</span> <span class="nf">add_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pos</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds column/s to a dataset</span>
+
+<span class="sd">        :param list | np.ndarray c: list or 1D np.ndarray for one column, list of list or 2D np.ndarray for multiple columns to be added</span>
+<span class="sd">        :param list of str | None columns: list - name for each column in c or None (auto naming with lowest possible number)</span>
+<span class="sd">        :param list | None | any dtype dtypes: None for auto dtype detection, any dtype that will be used for all columns in c, list of dtypes - one for each column in c</span>
+<span class="sd">        :param int | list | np.ndarray pos: position where to put new rows. ***defaults to -1* - works like append**, int to insert rows as one block, list of ints - for each row its desired location</span>
+
+<span class="sd">        .. danger::</span>
+<span class="sd">            providing dtypes=None with disabled auto dtype detection will cause usage of dtype choosen by numpy (in case of fed in list) or same as in fed in np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;Wrong column type provided.&quot;</span><span class="p">)</span>
+        <span class="n">num_cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">else</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtypes</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span> <span class="c1"># one type for all (None included)</span>
+            <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">dtypes</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_cols</span> 
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">columns</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_cols</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dtypes</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_cols</span><span class="p">,</span> <span class="s2">&quot;Number of provided dtypes don&#39;t match number of columns&quot;</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_cols</span><span class="p">,</span> <span class="s2">&quot;Number of provided names don&#39;t match number of columns&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_cols</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># single column as list or np.ndarray</span>
+            <span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_name</span><span class="p">()</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">dtypes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># multiple columns</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">):</span>
+                <span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_name</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">col</span> <span class="o">=</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">))],</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="n">dtypes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">col</span> <span class="o">=</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                        <span class="n">c</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> 
+                        <span class="n">dtype</span><span class="o">=</span><span class="n">dtypes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="n">dtypes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">dtype</span>
+                <span class="n">cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+            
+            <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;U32&quot;</span><span class="p">)</span>
+        <span class="n">dtypes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dtypes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pos</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="c1"># works as append</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">*</span> <span class="n">num_cols</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span> <span class="c1"># insert as one at given index</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_cols</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_cols</span><span class="p">,</span> <span class="s2">&quot;Number of provided positions don&#39;t match number of columns&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">columns</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataSet.add_r"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.add_r">[docs]</a>    <span class="k">def</span> <span class="nf">add_r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">pos</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds row/s to a dataset</span>
+
+<span class="sd">        :param list | np.ndarray r: list or 1D np.ndarray for one row, list of list or 2D np.ndarray for multiple rows to be added</span>
+<span class="sd">        :param int | list | np.ndarray pos: position where to put new rows. ***defaults to -1* - works like append**, int to insert rows as one block, list of ints - for each row its desired location</span>
+
+<span class="sd">        .. warning::</span>
+<span class="sd">            Each row must be same length as number of columns in the dataset. DataSet will try to cast each value in the row to corresponding column&#39;s dtype, which might change &quot;0001&quot; to 1 or cause an error (ex trying to case &quot;tree&quot; to uin8)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;Wrong row type provided.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span> <span class="c1"># single row</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># multiple rows</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+    
+        <span class="k">if</span> <span class="n">pos</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="c1"># works as append</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span> <span class="c1"># insert as one at given index</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="s2">&quot;Number of provided positions don&#39;t match number of rows&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># convert to columns dtypes</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">r</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataSet.join"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.join">[docs]</a>    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">pos</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Joins DataSet dt to itself</span>
+
+<span class="sd">        :param int | list | np.ndarray pos: position where to put new rows. ***defaults to -1* - works like append**, int to insert rows as one block, list of ints - for each row its desired location</span>
+<span class="sd">        :param int axis: 1 for column-wise join, 0 for row-wise join</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">DataSet</span><span class="p">),</span> <span class="s2">&quot;dt must be a smarty.datasets.DataSet&quot;</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="n">axis</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;Axis unrecognised&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_c</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">matrix_</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">columns_</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_r</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">matrix_</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataSet.copy"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: copy of self (maintaining all training prosperties as well, ex batch_size)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_ds</span> <span class="o">=</span> <span class="n">DataSet</span><span class="p">()</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_copy</span><span class="p">(</span><span class="n">new_ds</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_ds</span></div>
+
+<div class="viewcode-block" id="DataSet._get_idx"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet._get_idx">[docs]</a>    <span class="k">def</span> <span class="nf">_get_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param str name: name of column to be searched</span>
+<span class="sd">        :returns: index of first column named name</span>
+<span class="sd">        :raises: AssertionError if column named name is not found in the dataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="p">,</span> <span class="s2">&quot;Column not found.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_</span> <span class="o">==</span> <span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="DataSet._is_categorical"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet._is_categorical">[docs]</a>    <span class="k">def</span> <span class="nf">_is_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int idx: column index</span>
+<span class="sd">        :returns: True if column with index idx is categorical, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="ow">in</span> <span class="n">INT_TYPES</span> <span class="o">+</span> <span class="n">FLOAT_TYPES</span></div>
+
+    <span class="c1"># generate new column name if it wasn&#39;t provided (util func for add_c)</span>
+    <span class="k">def</span> <span class="nf">_get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># single column by name</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span> <span class="c1"># single column by idx</span>
+            <span class="k">return</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[:,</span> <span class="n">key</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="c1"># return as DataCol</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># multiple columns by names</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span> <span class="c1"># multiple columns by idxs</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[:,</span> <span class="n">key</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># some rows and column by name</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span> <span class="c1"># some rows and column by idx</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span> <span class="c1"># if only one row - so one cell - is selected</span>
+                <span class="k">return</span> <span class="n">data</span>
+            <span class="k">return</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">[</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span> <span class="c1"># return as DataCol</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># some rows and columns by names</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># single column by name</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()[</span><span class="mi">0</span><span class="p">]),</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">key</span><span class="p">)])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># multiple columns by names</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">key</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span> <span class="c1"># single column by idx</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()[</span><span class="mi">0</span><span class="p">]),</span> <span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span> <span class="c1"># multiple columns by idxs</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">key</span><span class="p">)</span>
+            
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># some rows and column by name</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># some rows and columns by names</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">value</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># if entire column/s reassigned, update its dtype in self.dtype_</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()[</span><span class="mi">0</span><span class="p">]:</span> 
+            <span class="n">cols</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">[</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="n">value</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">[</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">dtype</span>
+                <span class="n">cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+
+        <span class="c1"># cast each entry to desired type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dtypes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">[</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtypes_</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span> <span class="c1"># for one-column</span>
+                <span class="n">dtypes_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">dtypes_</span><span class="p">])</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">value</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtypes_</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="c1"># if it was a single cell</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Pawel Pozorski.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

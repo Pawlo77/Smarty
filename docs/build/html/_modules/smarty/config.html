@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>smarty.config &mdash; Smarty 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Smarty
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../smarty.datasets.html">smarty.datasets package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../smarty.preprocessing.html">smarty.preprocessing package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../smarty.config.html">smarty.config module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../smarty.errors.html">smarty.errors module</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Smarty</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>smarty.config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for smarty.config</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">smarty.errors</span> <span class="kn">import</span> <span class="n">assertion</span>
+
+
+<span class="c1"># enables / disables auto detection, administrated by DummyWriter</span>
+<div class="viewcode-block" id="Config"><a class="viewcode-back" href="../../smarty.config.html#smarty.config.Config">[docs]</a><span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Smarty config</span>
+
+<span class="sd">    :var bool VERBOSE: model&#39;s verbosity</span>
+<span class="sd">    :var bool _AUTO_DETECTION: **enables/disables** *smarty.datasets.datasets.DataSet* **auto dtype detection**, preferable not to change by set param but by *smarty.datasets.datasets.DataSet.dummy_writer*</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">VERBOSE</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_AUTO_DETECTION</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<span class="c1"># allows to temporarily change config with python&#39;s with statement</span>
+<span class="k">class</span> <span class="nc">ConfigOff</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_config</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">set_config</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">set_config</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Accuall *smarty.config.Config()* object that holds liblary configuration (note: after program&#39;s execution any changes are gone). </span>
+
+<span class="sd">.. note::</span>
+<span class="sd">    It is not reccommended to change the config directly.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">temp_config</span> <span class="o">=</span> <span class="n">ConfigOff</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Allows to temporarily change the config with auto-restore to previous option, ex:</span>
+
+<span class="sd">.. code-block:: python</span>
+<span class="sd">    :linenos:</span>
+<span class="sd">    </span>
+<span class="sd">    from smarty.config import temp_config</span>
+
+<span class="sd">    with temp_config(VERBOSE=False):</span>
+<span class="sd">        model.predict(test_ds)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="set_config"><a class="viewcode-back" href="../../smarty.config.html#smarty.config.set_config">[docs]</a><span class="k">def</span> <span class="nf">set_config</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set smarty.config.config property</span>
+
+<span class="sd">    :param str key: smarty.config.Config() class var</span>
+<span class="sd">    :param val: new value for smarty.config.config.key</span>
+
+<span class="sd">    :raises: AssertionError if provided key&#39;s val is in wrong dtype or if provided key is not *smarty.config.Config* var</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">match</span> <span class="n">key</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s2">&quot;VERBOSE&quot;</span><span class="p">:</span>
+            <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;VERBOSE must be a boolean value&quot;</span><span class="p">)</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">case</span> <span class="s2">&quot;_AUTO_DETECTION&quot;</span><span class="p">:</span> <span class="c1"># prefered not to change it </span>
+            <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;AUTO_DETECTION must be a boolean value&quot;</span><span class="p">)</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">_AUTO_DETECTION</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">case</span> <span class="k">_</span><span class="p">:</span>
+            <span class="n">assertion</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Config: key </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_config"><a class="viewcode-back" href="../../smarty.config.html#smarty.config.get_config">[docs]</a><span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get smarty.config.config property</span>
+
+<span class="sd">    :param str key: smarty.config.Config() class var</span>
+<span class="sd">    :raises: AssertionError if provided key is not *smarty.config.Config* var</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">match</span> <span class="n">key</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s2">&quot;VERBOSE&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">VERBOSE</span>
+        <span class="k">case</span> <span class="s2">&quot;_AUTO_DETECTION&quot;</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">_AUTO_DETECTION</span>
+        <span class="k">case</span> <span class="k">_</span><span class="p">:</span>
+            <span class="n">assertion</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Config: key </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Pawel Pozorski.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
