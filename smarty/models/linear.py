@@ -1,18 +1,18 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 from smarty.errors import assertion
 from smarty.config import temp_config
-from .metrics import mean_squared_error
+from .metrics import mean_squared_error, accuracy
 from .utils import prepare_ds, print_epoch, print_step
+from .base import MiniBatchGradientDescent, BaseModel
 
 
 LINEAR_SOLVERS = (
-    "sgd",
+    "mbgd",
     "norm_eq"
 )
 """
-:var str sgd: Stohastic Gradient Descent
+:var str mbgd: Mini-Batch Gradient Descent
 :var str norm_eq: Normal Equation
 """
 
@@ -20,6 +20,8 @@ LINEAR_SOLVERS = (
 class NormalEqSolver:
     def __init__(self, root):
         self.root = root
+        self.root.bias_ = None
+        self.root.coefs_ = None
 
     def fit(self, ds, *args, **kwargs):
         print_epoch(1, 1)
@@ -42,39 +44,33 @@ class NormalEqSolver:
         print_step(1, 1, loss=self.root.loss(ds.get_target_classes(), y_pred))
 
 
-class SgdSolver:
-    def __init__(self, root):
-        self.root = root
+class LinearSgdSolver(MiniBatchGradientDescent):
+    def __init__(self, *args, **kwargs):
+        super(LinearSgdSolver, self).__init__(*args, **kwargs)
 
-    def train_predict(self, X_b):
-        return X_b.dot(self.root.coefs_) + self.root.bias_
 
-    def gradient_step(self, X_b, y_b):
-        y_pred = self.train_predict(X_b)
-        const = self.root.learning_rate_ / self.m_
-        print(const * np.sum(X_b.T.dot(y_pred - y_b), axis=1))
+class LogisticSgdSolver(MiniBatchGradientDescent):
+    def __init__(self, *args, **kwargs):
+        super(LogisticSgdSolver, self).__init__(*args, **kwargs)
 
-        self.root.coefs_ -= const * np.sum(X_b.T.dot(y_pred - y_b))
-        self.root.bias_ -= const * np.sum(y_pred - y_b)
+    def predict(self, X_b):
+        y_pred = super().predict(X_b)
+        return (1.0 / (1.0 + np.exp(-y_pred))).astype("i")
+
+
+class PerceptronSolver(MiniBatchGradientDescent):
+    def __init__(self, *args, **kwargs):
+        super(PerceptronSolver, self).__init__(*args, **kwargs)
+
+    def predict(self, X_b):
+        y_pred = super().predict(X_b)
+        idxs = np.where(y_pred > self.root.threshold_)
+        y_pred = np.zeros(y_pred.shape)
+        y_pred[idxs] = 1
         return y_pred
 
-    def fit(self, ds, epochs=10, *args, **kwargs):
-        self.m_ = len(ds)
-        self.root.coefs_ = np.ones((len(ds.data_classes_), 1))
-        self.root.bias_ = np.zeros((1, 1))
 
-        src = iter(ds)
-        for epoch in range(epochs):
-            print_epoch(epoch + 1, epochs)
-
-            for step in range(ds.steps_per_epoch_()):
-                X_b, y_b = next(src)
-                y_pred = self.gradient_step(X_b, y_b)
-
-                print_step(step + 1, ds.steps_per_epoch_(), loss=self.root.loss(y_b, y_pred))
-
-
-class LinearRegression:
+class LinearRegression(BaseModel):
     """Linear model
 
     :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics
@@ -83,18 +79,19 @@ class LinearRegression:
     :var np.ndarray bias\_: model's bias term
     :var np.ndarray coefs\_: model's coefficients
     :var float learning_rate\_: model's learning rate
+
+    .. note::
+        If you are using solver="sgd", you can plot training curve via .plot_training() or see each eopch losses - list at .solver_.costs_
     """
 
-    def __init__(self, loss=mean_squared_error, solver="sgd", learning_rate=0.01):
+    def __init__(self, loss=mean_squared_error, solver="mbgd", learning_rate=0.0001):
         assertion(solver in LINEAR_SOLVERS, "Solver unrecognised, see models.linear.LINEAR_SOLVERS to see defined one.")
-        if solver == "sgd":
-            self.solver_ = SgdSolver(self)
+        if solver == "mbgd":
+            self.solver_ = LinearSgdSolver(self)
         else:
             self.solver_ = NormalEqSolver(self)
 
         self.loss = loss
-        self.bias_ = None
-        self.coefs_ = None
         self.learning_rate_ = learning_rate # used only for sgd solver
 
     def clean_copy(self):
@@ -107,87 +104,103 @@ class LinearRegression:
             learning_rate=self.learning_rate_
             )
 
-    @prepare_ds(mode="unsupervised")
+
+class LogisticRegression(BaseModel):
+    """Logistic binary classifier
+
+    :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics
+    :param float learning_rate: learning rate
+    :var np.ndarray bias\_: model's bias term
+    :var np.ndarray coefs\_: model's coefficients
+    :var float learning_rate\_: model's learning rate
+    """
+
+    def __init__(self, loss=accuracy, learning_rate=0.0001):
+        self.loss = loss
+        self.solver_ = LogisticSgdSolver(self)
+        self.learning_rate_ = learning_rate
+
     def fit(self, ds, *args, **kwargs):
-        """'Trains' the model. If solver="sgd", number of epochs can be set via kwargs (defaults to epochs=10)
+        # make sure the target class is correct for binary classification
+        target = ds.get_target_classes()
+        assertion(target.shape[1] == 1, "Binary classifier can have only one class")
+        unique = np.unique(target)
+        assertion(list(unique) == [0, 1], "Target class must consist only of 0 and 1")
+
+        return super().fit(ds, *args, **kwargs)
+
+    def clean_copy(self):
+        """
+        :returns: new unfited model with same parameters
+        """
+        return LogisticRegression(
+            loss=self.loss,
+            learning_rate=self.learning_rate_
+            )
+
+
+class Perceptron(BaseModel):
+    """Perceptron binary classifier
+
+    :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics
+    :param float learning_rate: learning rate
+    :param float threshold: values higher than threshold will be classified as 1, rest as 0
+    :var np.ndarray bias\_: model's bias term
+    :var np.ndarray coefs\_: model's coefficients
+    :var float learning_rate\_: model's learning rate
+    """
+
+    def __init__(self, loss=accuracy, learning_rate=0.0001, threshold=0.1):
+        self.loss = loss
+        self.solver_ = PerceptronSolver(self)
+        self.learning_rate_ = learning_rate
+        self.threshold_ = threshold
+
+    def fit(self, ds, *args, **kwargs):
+        # make sure the target class is correct for binary classification
+        target = ds.get_target_classes()
+        assertion(target.shape[1] == 1, "Binary classifier can have only one class")
+        unique = np.unique(target)
+        assertion(list(unique) == [0, 1], "Target class must consist only of 0 and 1")
+
+        return super().fit(ds, *args, **kwargs)
+
+    def clean_copy(self):
+        """
+        :returns: new unfited model with same parameters
+        """
+        return Perceptron(
+            loss=self.loss,
+            learning_rate=self.learning_rate_,
+            threshold=self.threshold_
+            )
+
+    def seek_threshold(self, ds, min_t=0.0, max_t=1.0, bins=5, mode="max", *args, **kwargs):
+        """Trains itself and keeps coefs and bias with highest accuracy
         
-        :param DataSet ds: a DataSet - data source, needs to have specified target classes
-        :returns: self
+        :param float min_t: minimum threshold value
+        :param float max_t: maximum threshold value
+        :param int bins: number of bins to check
+        :param str mode: 'max' - seeks for model with highest loss, 'min' - seeks for model with lowest loss
+        :returns: best found score (measurred via self.evaluate)
         """
-        self.solver_.fit(ds, *args, **kwargs)
-        return self
+        assertion(mode in ['max', 'min'], "Mode not recognized, allowed are 'min' or 'max'")
 
-    @prepare_ds(mode="unsupervised")
-    def predict(self, ds, *args, **kwargs):
-        """
-        :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()
-        :returns: 2D np.ndarray, where each culumn holds prediction for one of the targets
-        :raises: AssertionError if model is not fitted
-        """
-        assertion(self.bias_ is not None, "Call .fit() first.")
+        best_score = best_coefs = best_bias = best_threshold = None
+        for threshold in np.linspace(min_t, max_t, bins):
+            self.threshold_ = threshold
+            self.solver_ = PerceptronSolver(self)
+            
+            self.fit(ds, *args, **kwargs)
+            score = self.evaluate(ds, *args, **kwargs)
 
-        print_epoch(1, 1, "test")
-        y_pred = None
-        src = iter(ds)
-        for step in range(ds.steps_per_epoch_()):
-            x_b = next(src)
-            if ds.target_classes_ is not None:
-                x_b = x_b[0] # drop target
+            if best_score is None or (mode == "max" and score > best_score) or (mode == "min" and score < best_score):
+                best_threshold = threshold
+                best_score = score
+                best_coefs = self.coefs_
+                best_bias = self.bias_
 
-            y_pred_b = x_b.dot(self.coefs_) + self.bias_
-            print_step(step + 1, ds.steps_per_epoch_())
-
-            if y_pred is None:
-                y_pred = y_pred_b
-            else:
-                y_pred = np.r_[y_pred, y_pred_b]
-        return y_pred
-
-    @prepare_ds()
-    def evaluate(self, ds, loss=None, *args, **kwargs):
-        """Evaluates model on the ds according to loss and prints its score
-        
-        :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()
-        :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics. If not provided, loss given on model initialization will be used
-        :params args, kwargs: will be passed to .predict()
-        """
-        y_pred = self.predict(ds, *args, **kwargs)
-
-        if loss is None:
-            loss = self.loss
-        print(f"Loss: {loss(ds.get_target_classes(), y_pred)}.")
-
-    def plot(self, ds, data_idx=0, target_idx=0, *args, **kwargs):
-        """Creates a 2D plot where x-axis is data_idx, and y-axis is target_idx. Plots both their value and prediction curve
-
-        :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()
-        :param int data_idx: data column index used as x-axis
-        :param int target_class: target class index used as y-axis (0 - first target class, 1 - second (if exists) and so on)
-        :params args, kwargs: will be passed to .predict()
-        """
-        y_pred = self.predict(ds, *args, **kwargs)[:, target_idx]
-        y = ds.get_target_classes()[:, target_idx]
-        x = ds.get_data_classes()[:, data_idx]
-
-        plt.figure(figsize=(12, 8))
-        plt.plot(x, y, "b.", alpha=0.3)
-        plt.plot(x, y_pred, "r.", alpha=0.5)
-
-        x_min_idx = np.where(x == np.nanmin(x))[0][0]
-        x_max_idx = np.where(x == np.nanmax(x))[-1][-1]
-        xs = [x[x_min_idx], x[x_max_idx]]
-        ys = [y_pred[x_min_idx], y_pred[x_max_idx]]
-        plt.plot(xs, ys, "g-", linewidth=4, label="regression line")
-
-        x_lim = [x[x_min_idx], x[x_max_idx]]
-        y_min = np.nanmin(y)
-        y_max = np.nanmax(y)
-        y_pred_min = np.nanmin(y_pred)
-        y_pred_max = np.nanmax(y_pred)
-        y_lim = [y_min if y_min < y_pred_min else y_pred_min, y_max if y_max > y_pred_max else y_pred_max]
-
-        plt.axis([*x_lim, *y_lim])
-        plt.legend()
-        plt.xlabel(ds.data_classes_[data_idx])
-        plt.ylabel(ds.target_classes_[target_idx])
-        plt.show()
+        self.coefs_ = best_coefs
+        self.bias_ = best_bias
+        self.threshold_ = best_threshold
+        return best_score

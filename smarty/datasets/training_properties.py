@@ -37,8 +37,6 @@ class TrainingProperty:
         
         :param DataSet new: new DataSet instance
         """
-        assertion(isinstance(new, self), "new is not a DataSet instance")
-
         new.batch_size_ = self.batch_size_
         new.repeat_ = self.repeat_
         new.shuffle_ = self.shuffle_
@@ -103,8 +101,10 @@ class TrainingProperty:
 
         self.target_classes_ = key
         self.data_classes_ = [k for k in range(self.get_shape_()[1]) if k not in key] # set rest column as data_classes_
+        return self
 
-    def get_target_classes(self):
+    # _rows - specified rows indexes to be returned, only for internal use
+    def get_target_classes(self, _rows=None):
         """
         :returns: np.ndarray of columns being marked as target or an empty np.ndarray if there is no target
 
@@ -114,9 +114,13 @@ class TrainingProperty:
         dtype = self._get_common_dtype(self.target_classes_)
         if self.target_classes_ is None:
             return np.array([])
+
+        if _rows is not None:
+            return self.matrix_[_rows, self.target_classes_].astype(dtype)
         return self.matrix_[:, self.target_classes_].astype(dtype)
 
-    def get_data_classes(self):
+    # _rows - specified rows indexes to be returned, only for internal use
+    def get_data_classes(self, _rows=None):
         """
         :returns: np.ndarray of columns being marked as data or entire matrix\_ if no target column is selected
 
@@ -125,7 +129,12 @@ class TrainingProperty:
         """
         dtype = self._get_common_dtype(self.data_classes_)
         if self.target_classes_ is None:
+            if _rows is not None:
+                return self.matrix_[_rows, :].astype(dtype)
             return self.matrix_.astype(dtype)
+
+        if _rows is not None:
+            return self.matrix_[_rows, self.data_classes_].astype(dtype)
         return self.matrix_[:, self.data_classes_].astype(dtype)
 
     def _get_common_dtype(self, cols):
@@ -189,10 +198,11 @@ class TrainingProperty:
 
             # if sice exceedes remaining _incedes_
             if self._start_batch_idx_ + size > len(self._indeces_):
-                idxs = self._indeces_[self._start_batch_idx_:] # use remaining one
-                self._generate_indeces()
-                self._start_batch_idx_ = size - len(idxs) # how many we will take from next _indeces_
-                idxs = np.r_[idxs, self._indeces_[:self._start_batch_idx_]] # fill rest with new toss
+                while self._start_batch_idx_ + size > len(self._indeces_):
+                    idxs = self._indeces_[self._start_batch_idx_:] # use remaining one
+                    self._generate_indeces()
+                    self._start_batch_idx_ = size - len(idxs) # how many we will take from next _indeces_
+                    idxs = np.r_[idxs, self._indeces_[:self._start_batch_idx_]] # fill rest with new toss
             else:
                 idxs = self._indeces_[self._start_batch_idx_:self._start_batch_idx_ + size] # fill all from the current toss
                 self._start_batch_idx_ += size # mark to start next iteration by size later
@@ -200,13 +210,13 @@ class TrainingProperty:
             self._row_num_ -= size # we used next size rows
             idxs = idxs.reshape(-1, 1)
             if self.target_classes_ is not None and len(self.target_classes_) != 0: # supervised learning
-                return self.matrix_[idxs, self.data_classes_], self.matrix_[idxs, self.target_classes_]
+                return self.get_data_classes(idxs), self.get_target_classes(idxs)
             else: # unsupervised learning or not learning at all
-                return self.matrix_[idxs, :]
+                return self.get_data_classes(idxs)
         else: # we yielded everything we could
             raise StopIteration
 
-    def __iter__(self):
+    def __iter__(self, train=False):
         self._row_num_ = len(self)
         self._start_batch_idx_ = self._start_shuffle_idx_ = 0
         self._generate_indeces()

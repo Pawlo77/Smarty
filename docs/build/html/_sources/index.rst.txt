@@ -12,7 +12,7 @@ Overview
 **Smarty** is an open source end-to-end maschine learning python library. Providing both high-level and low-level api, it allows easy development of basic models as well as preprocessing and visualizing the data. Based on *numpy*, it does not support gpu operations, however remains well-scalable, with full control over dtypes and their structure.
 
 .. note::
-   This project is under active development.
+   This project is under active development, currently each model works under assumption that there is only one target class
 
 -------------
 Documentation

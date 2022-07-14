@@ -97,6 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.linear">smarty.models.linear module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#smarty-models-metrics-module">smarty.models.metrics module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.utils">smarty.models.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.base">smarty.models.base module</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="smarty.preprocessing.html">smarty.preprocessing package</a></li>
@@ -380,11 +381,11 @@
 <span id="smarty-models-linear-module"></span><h2>smarty.models.linear module<a class="headerlink" href="#module-smarty.models.linear" title="Permalink to this heading">¶</a></h2>
 <dl class="py data">
 <dt class="sig sig-object py" id="smarty.models.linear.LINEAR_SOLVERS">
-<span class="sig-prename descclassname"><span class="pre">smarty.models.linear.</span></span><span class="sig-name descname"><span class="pre">LINEAR_SOLVERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('sgd',</span> <span class="pre">'norm_eq')</span></em><a class="headerlink" href="#smarty.models.linear.LINEAR_SOLVERS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">smarty.models.linear.</span></span><span class="sig-name descname"><span class="pre">LINEAR_SOLVERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('mbgd',</span> <span class="pre">'norm_eq')</span></em><a class="headerlink" href="#smarty.models.linear.LINEAR_SOLVERS" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sgd</strong> (<em>str</em>) – Stohastic Gradient Descent</p></li>
+<li><p><strong>mbgd</strong> (<em>str</em>) – Mini-Batch Gradient Descent</p></li>
 <li><p><strong>norm_eq</strong> (<em>str</em>) – Normal Equation</p></li>
 </ul>
 </dd>
@@ -393,8 +394,8 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="smarty.models.linear.LinearRegression">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.linear.</span></span><span class="sig-name descname"><span class="pre">LinearRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss=&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver='sgd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate=0.01</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.linear.</span></span><span class="sig-name descname"><span class="pre">LinearRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss=&lt;function</span> <span class="pre">mean_squared_error&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver='mbgd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate=0.0001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smarty.models.base.BaseModel" title="smarty.models.base.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
 <p>Linear model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -412,6 +413,10 @@
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you are using solver=”sgd”, you can plot training curve via .plot_training() or see each eopch losses - list at .solver_.costs_</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="smarty.models.linear.LinearRegression.clean_copy">
 <span class="sig-name descname"><span class="pre">clean_copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression.clean_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression.clean_copy" title="Permalink to this definition">¶</a></dt>
@@ -422,27 +427,48 @@
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="smarty.models.linear.LinearRegression.evaluate">
-<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluates model on the ds according to loss and prints its score</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.models.linear.LinearSgdSolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.linear.</span></span><span class="sig-name descname"><span class="pre">LinearSgdSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearSgdSolver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearSgdSolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smarty.models.base.MiniBatchGradientDescent" title="smarty.models.base.MiniBatchGradientDescent"><code class="xref py py-class docutils literal notranslate"><span class="pre">MiniBatchGradientDescent</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.models.linear.LogisticRegression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.linear.</span></span><span class="sig-name descname"><span class="pre">LogisticRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss=&lt;function</span> <span class="pre">accuracy&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_rate=0.0001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LogisticRegression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LogisticRegression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smarty.models.base.BaseModel" title="smarty.models.base.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Logistic binary classifier</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
-<li><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics. If not provided, loss given on model initialization will be used</p></li>
+<li><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</p></li>
+<li><p><strong>learning_rate</strong> (<em>float</em>) – learning rate</p></li>
 </ul>
 </dd>
-<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
-<dd class="field-even"><p>will be passed to .predict()</p>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>bias_</strong> (<em>np.ndarray</em>) – model’s bias term</p></li>
+<li><p><strong>coefs_</strong> (<em>np.ndarray</em>) – model’s coefficients</p></li>
+<li><p><strong>learning_rate_</strong> (<em>float</em>) – model’s learning rate</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.linear.LogisticRegression.clean_copy">
+<span class="sig-name descname"><span class="pre">clean_copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LogisticRegression.clean_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LogisticRegression.clean_copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>new unfited model with same parameters</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="smarty.models.linear.LinearRegression.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>‘Trains’ the model. If solver=”sgd”, number of epochs can be set via kwargs (defaults to epochs=10)</p>
+<dt class="sig sig-object py" id="smarty.models.linear.LogisticRegression.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LogisticRegression.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LogisticRegression.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘Trains’ the model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes</p>
@@ -453,38 +479,18 @@
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="smarty.models.linear.LinearRegression.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a 2D plot where x-axis is data_idx, and y-axis is target_idx. Plots both their value and prediction curve</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
-<li><p><strong>data_idx</strong> (<em>int</em>) – data column index used as x-axis</p></li>
-</ul>
-</dd>
-<dt class="field-even">Para int target_class<span class="colon">:</span></dt>
-<dd class="field-even"><p>target class index used as y-axis (0 - first target class, 1 - second (if exists) and so on)</p>
-</dd>
-<dt class="field-odd">Params args, kwargs<span class="colon">:</span></dt>
-<dd class="field-odd"><p>will be passed to .predict()</p>
-</dd>
-</dl>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.models.linear.LogisticSgdSolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.linear.</span></span><span class="sig-name descname"><span class="pre">LogisticSgdSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LogisticSgdSolver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LogisticSgdSolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smarty.models.base.MiniBatchGradientDescent" title="smarty.models.base.MiniBatchGradientDescent"><code class="xref py py-class docutils literal notranslate"><span class="pre">MiniBatchGradientDescent</span></code></a></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="smarty.models.linear.LinearRegression.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LinearRegression.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LinearRegression.predict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="smarty.models.linear.LogisticSgdSolver.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/linear.html#LogisticSgdSolver.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.linear.LogisticSgdSolver.predict" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>2D np.ndarray, where each culumn holds prediction for one of the targets</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p>AssertionError if model is not fitted</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray of predicted targets for X_b</p>
 </dd>
 </dl>
 </dd></dl>
@@ -570,6 +576,116 @@
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+</section>
+<section id="module-smarty.models.base">
+<span id="smarty-models-base-module"></span><h2>smarty.models.base module<a class="headerlink" href="#module-smarty.models.base" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.models.base.BaseModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.base.</span></span><span class="sig-name descname"><span class="pre">BaseModel</span></span><a class="reference internal" href="_modules/smarty/models/base.html#BaseModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.base.BaseModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base model, to work it needs to be provided with coefs_, bias_, solver_ and loss function</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.base.BaseModel.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/base.html#BaseModel.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.base.BaseModel.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates model on the ds according to loss and prints its score</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics. If not provided, loss given on model initialization will be used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>will be passed to .predict()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.base.BaseModel.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/base.html#BaseModel.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.base.BaseModel.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘Trains’ the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.base.BaseModel.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/base.html#BaseModel.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.base.BaseModel.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a 2D plot where x-axis is data_idx, and y-axis is target_idx. Plots both their value and prediction curve</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>data_idx</strong> (<em>int</em>) – data column index used as x-axis</p></li>
+<li><p><strong>target_class</strong> (<em>int</em>) – target class index used as y-axis (0 - first target class, 1 - second (if exists) and so on)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>will be passed to .predict()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.base.BaseModel.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/base.html#BaseModel.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.base.BaseModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D np.ndarray, where each culumn holds prediction for one of the targets</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError if model is not fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.models.base.MiniBatchGradientDescent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.base.</span></span><span class="sig-name descname"><span class="pre">MiniBatchGradientDescent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/base.html#MiniBatchGradientDescent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.base.MiniBatchGradientDescent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Mini batch gradient descent base implementation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.base.MiniBatchGradientDescent.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/base.html#MiniBatchGradientDescent.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.base.MiniBatchGradientDescent.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Trains the model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.base.MiniBatchGradientDescent.gradient_step">
+<span class="sig-name descname"><span class="pre">gradient_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/base.html#MiniBatchGradientDescent.gradient_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.base.MiniBatchGradientDescent.gradient_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs coefficients optimization.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.base.MiniBatchGradientDescent.plot_training">
+<span class="sig-name descname"><span class="pre">plot_training</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/base.html#MiniBatchGradientDescent.plot_training"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.base.MiniBatchGradientDescent.plot_training" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots training curves (loss over epochs)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.base.MiniBatchGradientDescent.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/base.html#MiniBatchGradientDescent.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.base.MiniBatchGradientDescent.predict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray of predicted targets for X_b</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>

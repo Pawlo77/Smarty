@@ -159,20 +159,20 @@
             
   <h1>Source code for smarty.models.linear</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="kn">from</span> <span class="nn">smarty.errors</span> <span class="kn">import</span> <span class="n">assertion</span>
 <span class="kn">from</span> <span class="nn">smarty.config</span> <span class="kn">import</span> <span class="n">temp_config</span>
-<span class="kn">from</span> <span class="nn">.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">accuracy</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">prepare_ds</span><span class="p">,</span> <span class="n">print_epoch</span><span class="p">,</span> <span class="n">print_step</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">MiniBatchGradientDescent</span><span class="p">,</span> <span class="n">BaseModel</span>
 
 
 <span class="n">LINEAR_SOLVERS</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;sgd&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mbgd&quot;</span><span class="p">,</span>
     <span class="s2">&quot;norm_eq&quot;</span>
 <span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">:var str sgd: Stohastic Gradient Descent</span>
+<span class="sd">:var str mbgd: Mini-Batch Gradient Descent</span>
 <span class="sd">:var str norm_eq: Normal Equation</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -180,6 +180,8 @@
 <span class="k">class</span> <span class="nc">NormalEqSolver</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">print_epoch</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
@@ -202,39 +204,21 @@
         <span class="n">print_step</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">(),</span> <span class="n">y_pred</span><span class="p">))</span>
 
 
-<span class="k">class</span> <span class="nc">SgdSolver</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
-
-    <span class="k">def</span> <span class="nf">train_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">X_b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span>
-
-    <span class="k">def</span> <span class="nf">gradient_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">):</span>
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_predict</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
-        <span class="c1"># print(np.c_[y_pred, y_b, y_pred - y_b])</span>
-        <span class="n">const</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">learning_rate_</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">m_</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">-=</span> <span class="n">const</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">X_b</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">y_pred</span> <span class="o">-</span> <span class="n">y_b</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span> <span class="o">-=</span> <span class="n">const</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_pred</span> <span class="o">-</span> <span class="n">y_b</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">y_pred</span>
-
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">m_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_classes_</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-
-        <span class="n">src</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
-            <span class="n">print_epoch</span><span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">epochs</span><span class="p">)</span>
-
-            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">steps_per_epoch_</span><span class="p">()):</span>
-                <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
-                <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient_step</span><span class="p">(</span><span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">)</span>
-
-                <span class="n">print_step</span><span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">steps_per_epoch_</span><span class="p">(),</span> <span class="n">loss</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">y_b</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">))</span>
+<div class="viewcode-block" id="LinearSgdSolver"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LinearSgdSolver">[docs]</a><span class="k">class</span> <span class="nc">LinearSgdSolver</span><span class="p">(</span><span class="n">MiniBatchGradientDescent</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LinearSgdSolver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="LinearRegression"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LinearRegression">[docs]</a><span class="k">class</span> <span class="nc">LinearRegression</span><span class="p">:</span>
+<div class="viewcode-block" id="LogisticSgdSolver"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticSgdSolver">[docs]</a><span class="k">class</span> <span class="nc">LogisticSgdSolver</span><span class="p">(</span><span class="n">MiniBatchGradientDescent</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LogisticSgdSolver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LogisticSgdSolver.predict"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticSgdSolver.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">):</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">y_pred</span><span class="p">)))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="LinearRegression"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LinearRegression">[docs]</a><span class="k">class</span> <span class="nc">LinearRegression</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Linear model</span>
 
 <span class="sd">    :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</span>
@@ -243,18 +227,19 @@
 <span class="sd">    :var np.ndarray bias\_: model&#39;s bias term</span>
 <span class="sd">    :var np.ndarray coefs\_: model&#39;s coefficients</span>
 <span class="sd">    :var float learning_rate\_: model&#39;s learning rate</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        If you are using solver=&quot;sgd&quot;, you can plot training curve via .plot_training() or see each eopch losses - list at .solver_.costs_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sgd&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;mbgd&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">):</span>
         <span class="n">assertion</span><span class="p">(</span><span class="n">solver</span> <span class="ow">in</span> <span class="n">LINEAR_SOLVERS</span><span class="p">,</span> <span class="s2">&quot;Solver unrecognised, see models.linear.LINEAR_SOLVERS to see defined one.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">&quot;sgd&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span> <span class="o">=</span> <span class="n">SgdSolver</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">&quot;mbgd&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span> <span class="o">=</span> <span class="n">LinearSgdSolver</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span> <span class="o">=</span> <span class="n">NormalEqSolver</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bias_</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate_</span> <span class="o">=</span> <span class="n">learning_rate</span> <span class="c1"># used only for sgd solver</span>
 
 <div class="viewcode-block" id="LinearRegression.clean_copy"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LinearRegression.clean_copy">[docs]</a>    <span class="k">def</span> <span class="nf">clean_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -265,74 +250,42 @@
             <span class="n">loss</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span>
             <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sgd&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_</span><span class="p">,</span> <span class="n">SgdSolver</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;norm_eq&quot;</span><span class="p">,</span>
             <span class="n">learning_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_rate_</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="LinearRegression.fit"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LinearRegression.fit">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;unsupervised&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;&#39;Trains&#39; the model. If solver=&quot;sgd&quot;, number of epochs can be set via kwargs (defaults to epochs=10)</span>
-<span class="sd">        </span>
-<span class="sd">        :param DataSet ds: a DataSet - data source, needs to have specified target classes</span>
-<span class="sd">        :returns: self</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="LinearRegression.predict"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LinearRegression.predict">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;unsupervised&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="LogisticRegression"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticRegression">[docs]</a><span class="k">class</span> <span class="nc">LogisticRegression</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Logistic binary classifier</span>
+
+<span class="sd">    :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</span>
+<span class="sd">    :param float learning_rate: learning rate</span>
+<span class="sd">    :var np.ndarray bias\_: model&#39;s bias term</span>
+<span class="sd">    :var np.ndarray coefs\_: model&#39;s coefficients</span>
+<span class="sd">    :var float learning_rate\_: model&#39;s learning rate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span> <span class="o">=</span> <span class="n">LogisticSgdSolver</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate_</span> <span class="o">=</span> <span class="n">learning_rate</span>
+
+<div class="viewcode-block" id="LogisticRegression.fit"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticRegression.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># make sure the target class is correct for binary classification</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">()</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Binary classifier can have only one class&quot;</span><span class="p">)</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">unique</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;Target class must consist only of 0 and 1&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogisticRegression.clean_copy"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticRegression.clean_copy">[docs]</a>    <span class="k">def</span> <span class="nf">clean_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</span>
-<span class="sd">        :returns: 2D np.ndarray, where each culumn holds prediction for one of the targets</span>
-<span class="sd">        :raises: AssertionError if model is not fitted</span>
+<span class="sd">        :returns: new unfited model with same parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">assertion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Call .fit() first.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">LogisticRegression</span><span class="p">(</span>
+            <span class="n">loss</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_rate_</span>
+            <span class="p">)</span></div></div>
 
-        <span class="n">print_epoch</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span>
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">steps_per_epoch_</span><span class="p">()):</span>
-            <span class="n">x_b</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">target_classes_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">x_b</span> <span class="o">=</span> <span class="n">x_b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># drop target</span>
-
-            <span class="n">y_pred_b</span> <span class="o">=</span> <span class="n">x_b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coefs_</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bias_</span>
-            <span class="n">print_step</span><span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">steps_per_epoch_</span><span class="p">())</span>
-
-            <span class="k">if</span> <span class="n">y_pred</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">y_pred</span> <span class="o">=</span> <span class="n">y_pred_b</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y_pred_b</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">y_pred</span></div>
-
-<div class="viewcode-block" id="LinearRegression.evaluate"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LinearRegression.evaluate">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Evaluates model on the ds according to loss and prints its score</span>
-<span class="sd">        </span>
-<span class="sd">        :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</span>
-<span class="sd">        :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics. If not provided, loss given on model initialization will be used</span>
-<span class="sd">        :params args, kwargs: will be passed to .predict()</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loss: </span><span class="si">{</span><span class="n">loss</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">(),</span> <span class="n">y_pred</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="LinearRegression.plot"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LinearRegression.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">data_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">target_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Creates a 2D plot where x-axis is data_idx, and y-axis is target_idx. Plots both their value and prediction curve</span>
-
-<span class="sd">        :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</span>
-<span class="sd">        :param int data_idx: data column index used as x-axis</span>
-<span class="sd">        :para int target_class: target class index used as y-axis (0 - first target class, 1 - second (if exists) and so on)</span>
-<span class="sd">        :params args, kwargs: will be passed to .predict()</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[:,</span> <span class="n">target_idx</span><span class="p">]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">()[:,</span> <span class="n">target_idx</span><span class="p">]</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_data_classes</span><span class="p">()[:,</span> <span class="n">data_idx</span><span class="p">]</span>
-
-        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;b.&quot;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;r.&quot;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>

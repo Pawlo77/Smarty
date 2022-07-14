@@ -181,7 +181,8 @@
 <span class="k">class</span> <span class="nc">DataCol</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="n">col</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">col</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># fill empty cells</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">_handle_empty</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># if any dtype passed </span>
                 <span class="k">return</span> <span class="n">col</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">get_config</span><span class="p">(</span><span class="s2">&quot;_AUTO_DETECTION&quot;</span><span class="p">):</span> <span class="c1"># if auto detection is enabled</span>
@@ -189,10 +190,22 @@
             <span class="k">return</span> <span class="n">col</span>
 
         <span class="n">col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
-        <span class="n">col</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">col</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># fill empty cells</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">_handle_empty</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">col</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span> <span class="c1"># convert to np.ndarray with specified dtype</span>
         <span class="k">return</span> <span class="n">DataCol</span><span class="o">.</span><span class="n">_find_type</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="c1"># convert to np.ndarray and find dtype</span>
+
+    <span class="k">def</span> <span class="nf">_handle_empty</span><span class="p">(</span><span class="n">col</span><span class="p">):</span>
+        <span class="n">empty</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">col</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">empty</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># fill empty cells</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">)</span>
+                <span class="n">col</span><span class="p">[</span><span class="n">empty</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;nan&quot;</span> 
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">col</span><span class="p">[</span><span class="n">empty</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">return</span> <span class="n">col</span>
 
     <span class="k">def</span> <span class="nf">_find_type</span><span class="p">(</span><span class="n">col</span><span class="p">):</span> <span class="c1"># note: it doesn&#39;t check if float precision meet, for floats preferable to do it alone</span>
         <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">):</span>
@@ -256,6 +269,9 @@
 <span class="sd">        print(ds[&quot;sepal_width&quot;]) # entire SepalWidth column</span>
 <span class="sd">        ds[41, &quot;sepal_width&quot;] = 2.3 # set 42th row of &quot;sepal_width&quot; column to 2.3</span>
 <span class="sd">        ds[36, 3] = 1.7 # set 37th row of 4th column to 1.7</span>
+
+<span class="sd">    .. warning::</span>
+<span class="sd">        Providing columns with missing data (ie &quot;&quot;) might cause them to convert to dtype of &quot;U&quot; or float regardless to your actions</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -270,10 +286,8 @@
 
 <div class="viewcode-block" id="DataSet.get_shape_"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.get_shape_">[docs]</a>    <span class="k">def</span> <span class="nf">get_shape_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :returns: matrix\_ shape if it is not empty else (0, )</span>
+<span class="sd">        :returns: matrix\_ shape</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-            <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="o">.</span><span class="n">shape</span></div>
 
 <div class="viewcode-block" id="DataSet.categorical_idxs_"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.categorical_idxs_">[docs]</a>    <span class="k">def</span> <span class="nf">categorical_idxs_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
@@ -300,7 +314,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: boolean indicating whether the dataset is empty.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DataSet.get_catedorical"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.get_catedorical">[docs]</a>    <span class="k">def</span> <span class="nf">get_catedorical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -411,7 +425,7 @@
 <span class="sd">        :param list | None | any dtype dtypes: None for auto dtype detection, any dtype that will be used for all columns in c, list of dtypes - one for each column in c</span>
 <span class="sd">        :param int | list | np.ndarray pos: position where to put new rows. ***defaults to -1* - works like append**, int to insert rows as one block, list of ints - for each row its desired location</span>
 
-<span class="sd">        .. danger::</span>
+<span class="sd">        .. warning::</span>
 <span class="sd">            providing dtypes=None with disabled auto dtype detection will cause usage of dtype choosen by numpy (in case of fed in list) or same as in fed in np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 

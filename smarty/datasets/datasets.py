@@ -21,7 +21,8 @@ FLOAT_TYPES = (
 class DataCol:
     def create(col, dtype=None):
         if isinstance(col, np.ndarray):
-            col[np.where(col=='')] = np.nan # fill empty cells
+            col = DataCol._handle_empty(col)
+
             if dtype is not None: # if any dtype passed 
                 return col.astype(dtype)
             if get_config("_AUTO_DETECTION"): # if auto detection is enabled
@@ -29,10 +30,22 @@ class DataCol:
             return col
 
         col = np.array(col)
-        col[np.where(col=='')] = np.nan # fill empty cells
+        col = DataCol._handle_empty(col)
         if dtype is not None:
             return col.astype(dtype) # convert to np.ndarray with specified dtype
         return DataCol._find_type(col) # convert to np.ndarray and find dtype
+
+    def _handle_empty(col):
+        empty = np.where(col=='')[0]
+        if len(empty) != 0: # fill empty cells
+            try:
+                col = col.astype("f")
+            except Exception as e:
+                col = col.astype("U")
+                col[empty] = "nan" 
+            else:
+                col[empty] = np.nan
+        return col
 
     def _find_type(col): # note: it doesn't check if float precision meet, for floats preferable to do it alone
         def check(info, min_, max_):
@@ -96,6 +109,9 @@ class DataSet(TrainingProperty, StatisticsProperty):
         print(ds["sepal_width"]) # entire SepalWidth column
         ds[41, "sepal_width"] = 2.3 # set 42th row of "sepal_width" column to 2.3
         ds[36, 3] = 1.7 # set 37th row of 4th column to 1.7
+
+    .. warning::
+        Providing columns with missing data (ie "") might cause them to convert to dtype of "U" or float regardless to your actions
     """
 
     def __init__(self):
@@ -110,10 +126,8 @@ class DataSet(TrainingProperty, StatisticsProperty):
 
     def get_shape_(self):
         """
-        :returns: matrix\_ shape if it is not empty else (0, )
+        :returns: matrix\_ shape
         """
-        if self.matrix_ is None or not self.matrix_.any():
-            return (0, )
         return self.matrix_.shape
 
     def categorical_idxs_(self): 
@@ -140,7 +154,7 @@ class DataSet(TrainingProperty, StatisticsProperty):
         """
         :returns: boolean indicating whether the dataset is empty.
         """
-        return self.get_shape_() == (0, )
+        return self.get_shape_() == (0, ) or self.get_shape_() == (1, 0)
 
     def get_catedorical(self):
         """
@@ -251,7 +265,7 @@ class DataSet(TrainingProperty, StatisticsProperty):
         :param list | None | any dtype dtypes: None for auto dtype detection, any dtype that will be used for all columns in c, list of dtypes - one for each column in c
         :param int | list | np.ndarray pos: position where to put new rows. ***defaults to -1* - works like append**, int to insert rows as one block, list of ints - for each row its desired location
 
-        .. danger::
+        .. warning::
             providing dtypes=None with disabled auto dtype detection will cause usage of dtype choosen by numpy (in case of fed in list) or same as in fed in np.ndarray
         """
 

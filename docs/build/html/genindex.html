@@ -216,6 +216,10 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="smarty.models.html#smarty.models.base.BaseModel">BaseModel (class in smarty.models.base)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.batch">batch() (smarty.datasets.training_properties.TrainingProperty method)</a>
 </li>
   </ul></td>
@@ -232,6 +236,8 @@
         <li><a href="smarty.models.html#smarty.models.dumb.ZeroRuleModel.clean_copy">(smarty.models.dumb.ZeroRuleModel method)</a>
 </li>
         <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.clean_copy">(smarty.models.linear.LinearRegression method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.LogisticRegression.clean_copy">(smarty.models.linear.LogisticRegression method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -276,7 +282,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smarty.datasets.html#smarty.datasets.datasets.DataSet.empty_">empty_() (smarty.datasets.datasets.DataSet method)</a>
 </li>
-      <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.evaluate">evaluate() (smarty.models.linear.LinearRegression method)</a>
+      <li><a href="smarty.models.html#smarty.models.base.BaseModel.evaluate">evaluate() (smarty.models.base.BaseModel method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -294,12 +300,16 @@
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.stats_properties.StatisticsProperty.fill_nan">fill_nan() (smarty.datasets.stats_properties.StatisticsProperty method)</a>
 </li>
-      <li><a href="smarty.models.html#smarty.models.dumb.RandomModel.fit">fit() (smarty.models.dumb.RandomModel method)</a>
+      <li><a href="smarty.models.html#smarty.models.base.BaseModel.fit">fit() (smarty.models.base.BaseModel method)</a>
 
       <ul>
+        <li><a href="smarty.models.html#smarty.models.base.MiniBatchGradientDescent.fit">(smarty.models.base.MiniBatchGradientDescent method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.dumb.RandomModel.fit">(smarty.models.dumb.RandomModel method)</a>
+</li>
         <li><a href="smarty.models.html#smarty.models.dumb.ZeroRuleModel.fit">(smarty.models.dumb.ZeroRuleModel method)</a>
 </li>
-        <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.fit">(smarty.models.linear.LinearRegression method)</a>
+        <li><a href="smarty.models.html#smarty.models.linear.LogisticRegression.fit">(smarty.models.linear.LogisticRegression method)</a>
 </li>
         <li><a href="smarty.preprocessing.html#smarty.preprocessing.categorical.OneHotEncoder.fit">(smarty.preprocessing.categorical.OneHotEncoder method)</a>
 </li>
@@ -314,6 +324,8 @@
         <li><a href="smarty.preprocessing.html#smarty.preprocessing.numerical.StandardScaler.fit_transform">(smarty.preprocessing.numerical.StandardScaler method)</a>
 </li>
       </ul></li>
+      <li><a href="smarty.preprocessing.html#smarty.preprocessing.categorical.OneHotEncoder.flat_names_">flat_names_() (smarty.preprocessing.categorical.OneHotEncoder method)</a>
+</li>
       <li><a href="smarty.datasets.html#smarty.datasets.datasets.FLOAT_TYPES">FLOAT_TYPES (in module smarty.datasets.datasets)</a>
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.datasets.DataSet.from_object">from_object() (smarty.datasets.datasets.DataSet method)</a>
@@ -337,6 +349,8 @@
       <li><a href="smarty.datasets.html#smarty.datasets.datasets.DataSet.get_shape_">get_shape_() (smarty.datasets.datasets.DataSet method)</a>
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.get_target_classes">get_target_classes() (smarty.datasets.training_properties.TrainingProperty method)</a>
+</li>
+      <li><a href="smarty.models.html#smarty.models.base.MiniBatchGradientDescent.gradient_step">gradient_step() (smarty.models.base.MiniBatchGradientDescent method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -374,11 +388,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smarty.models.html#smarty.models.linear.LINEAR_SOLVERS">LINEAR_SOLVERS (in module smarty.models.linear)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smarty.models.html#smarty.models.linear.LinearRegression">LinearRegression (class in smarty.models.linear)</a>
 </li>
+      <li><a href="smarty.models.html#smarty.models.linear.LinearSgdSolver">LinearSgdSolver (class in smarty.models.linear)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smarty.datasets.html#smarty.datasets.utils.load_data">load_data() (in module smarty.datasets.utils)</a>
+</li>
+      <li><a href="smarty.models.html#smarty.models.linear.LogisticRegression">LogisticRegression (class in smarty.models.linear)</a>
+</li>
+      <li><a href="smarty.models.html#smarty.models.linear.LogisticSgdSolver">LogisticSgdSolver (class in smarty.models.linear)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -387,6 +407,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smarty.models.html#smarty.models.metrics.mean_squared_error">mean_squared_error() (in module smarty.models.metrics)</a>
+</li>
+      <li><a href="smarty.models.html#smarty.models.base.MiniBatchGradientDescent">MiniBatchGradientDescent (class in smarty.models.base)</a>
 </li>
       <li>
     module
@@ -405,6 +427,8 @@
         <li><a href="smarty.errors.html#module-smarty.errors">smarty.errors</a>
 </li>
         <li><a href="smarty.models.html#module-smarty.models.api">smarty.models.api</a>
+</li>
+        <li><a href="smarty.models.html#module-smarty.models.base">smarty.models.base</a>
 </li>
         <li><a href="smarty.models.html#module-smarty.models.dumb">smarty.models.dumb</a>
 </li>
@@ -445,18 +469,22 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.plot">plot() (smarty.models.linear.LinearRegression method)</a>
+      <li><a href="smarty.models.html#smarty.models.base.BaseModel.plot">plot() (smarty.models.base.BaseModel method)</a>
+</li>
+      <li><a href="smarty.models.html#smarty.models.base.MiniBatchGradientDescent.plot_training">plot_training() (smarty.models.base.MiniBatchGradientDescent method)</a>
 </li>
       <li><a href="smarty.models.html#smarty.models.metrics.precision">precision() (in module smarty.models.metrics)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smarty.models.html#smarty.models.dumb.RandomModel.predict">predict() (smarty.models.dumb.RandomModel method)</a>
+      <li><a href="smarty.models.html#smarty.models.base.BaseModel.predict">predict() (smarty.models.base.BaseModel method)</a>
 
       <ul>
+        <li><a href="smarty.models.html#smarty.models.base.MiniBatchGradientDescent.predict">(smarty.models.base.MiniBatchGradientDescent method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.dumb.RandomModel.predict">(smarty.models.dumb.RandomModel method)</a>
+</li>
         <li><a href="smarty.models.html#smarty.models.dumb.ZeroRuleModel.predict">(smarty.models.dumb.ZeroRuleModel method)</a>
 </li>
-        <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.predict">(smarty.models.linear.LinearRegression method)</a>
+        <li><a href="smarty.models.html#smarty.models.linear.LogisticSgdSolver.predict">(smarty.models.linear.LogisticSgdSolver method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -533,13 +561,20 @@
         <li><a href="smarty.errors.html#module-smarty.errors">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     smarty.models.api
 
       <ul>
         <li><a href="smarty.models.html#module-smarty.models.api">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    smarty.models.base
+
+      <ul>
+        <li><a href="smarty.models.html#module-smarty.models.base">module</a>
 </li>
       </ul></li>
       <li>

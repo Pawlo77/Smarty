@@ -39,3 +39,10 @@ smarty.models.utils module
 .. automodule:: smarty.models.utils
    :members:
    :show-inheritance:
+
+smarty.models.base module
+--------------------------
+
+.. automodule:: smarty.models.base
+   :members:
+   :show-inheritance:

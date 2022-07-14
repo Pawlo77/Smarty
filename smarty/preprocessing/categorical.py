@@ -19,6 +19,20 @@ class OneHotEncoder:
         self.decoders_ = []
         self.classes_ = []
 
+    def flat_names_(self):
+        """
+        :returns: 1D array filled with self.classes\_
+        :raises: AssertionError if Encoder wasn't fitted 
+        """
+        assertion(len(self.encoders_) != 0, "Call .fit() first.")
+        flat_names = None
+        for column in self.classes_:
+            if flat_names is None:
+                flat_names = column
+            else:
+                flat_names = np.r_[flat_names, column]
+        return flat_names
+
     def fit(self, cols):
         """Prepares an one-hot map for each column of cols.
         
@@ -30,7 +44,7 @@ class OneHotEncoder:
 
         for i in range(cols.shape[1]): # for each provided column
             self.classes_.append(np.sort(np.unique(cols[:, i])))
-            empty_code_ = ["0"] * len(self.classes_[i]) # generate base empty code - string of length - number of classes - filled with "0"
+            empty_code_ = [0] * len(self.classes_[i]) # generate base empty code - string of length - number of classes - filled with "0"
 
             self.encoders_.append({ # for each class set one of "0"s to "1" - generate one hot
                 class_: self._create_code(empty_code_, idx) for idx, class_ in enumerate(self.classes_[i])
@@ -55,9 +69,15 @@ class OneHotEncoder:
         assertion(len(self.encoders_) != 0, "Call .fit() first.")
 
         cols = cols.astype("object") # in case transformed data didn't fit in the original array dtype
+        res = None
         for i in range(self._num_cols_):
-            cols[:, i] = [self.encoders_[i][val] for val in cols[:, i]]
-        return cols
+            col = np.array([self.encoders_[i][val] for val in cols[:, i]])
+            if res is None:
+                res = col
+            else:
+                res = np.c_[res, col]
+
+        return res
 
     def fit_transform(self, cols):
         """Fits Encoder with cols and returns their one-hot representation. (calls .fit() than .transform())
@@ -75,21 +95,28 @@ class OneHotEncoder:
         """Translates one-hots back to the original value
         
         :param np.ndarray cols: 2D array, where axis-1 are rows
-        :raises: AssertionError if Encoder wasn't fitted  or number of columns in cols is different than that in .fit()
+        :raises: AssertionError if Encoder wasn't fitted  or number of columns in cols is different than that returned by .transform()
         
         .. danger::
             Function will crash if any value in cols wasn't seen by .fit() method. (wasn't mapped into decoders\_)
         """
-        assertion(cols.shape[1] == self._num_cols_, "Different number of columns provided to one in .fit()")
+        assertion(cols.shape[1] == len(self.flat_names_()), "Different number of columns provided to that returned by .transform()")
         assertion(len(self.encoders_) != 0, "Call .fit() first.")
 
         cols = cols.astype("object") # in case transformed data didn't fit in the original array
-        for i in range(self._num_cols_):
-            cols[:, i] = [self.decoders_[i][val] for val in cols[:, i]]
-        return cols
+        res = None
+        i = 0
+        for idx, unique in enumerate(self.classes_): 
+            col = np.array([self.decoders_[idx][tuple(val)] for val in cols[:, i : i + len(unique)]]).reshape(-1, 1)
+            if res is None:
+                res = col
+            else:
+                res = np.c_[res, col]
+            i += len(unique)
+        return res
 
     # utility function to help create a lookup by .fit()
     def _create_code(self, empty_code_, idx):
         code_ =  empty_code_[:]
-        code_[idx] = "1"
-        return "".join(code_)
+        code_[idx] = 1
+        return tuple(code_)
