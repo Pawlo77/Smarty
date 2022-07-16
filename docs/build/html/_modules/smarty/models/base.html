@@ -89,6 +89,8 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.datasets.html">smarty.datasets package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.metrics.html">smarty.metrics module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.callbacks.html">smarty.callbacks module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.preprocessing.html">smarty.preprocessing package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.config.html">smarty.config module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.errors.html">smarty.errors module</a></li>
@@ -162,53 +164,78 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="kn">from</span> <span class="nn">smarty.errors</span> <span class="kn">import</span> <span class="n">assertion</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">prepare_ds</span><span class="p">,</span> <span class="n">print_epoch</span><span class="p">,</span> <span class="n">print_step</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">prepare_ds</span><span class="p">,</span> <span class="n">print_epoch</span><span class="p">,</span> <span class="n">print_step</span><span class="p">,</span> <span class="n">handle_callbacks</span><span class="p">,</span> <span class="n">print_info</span>
 
 
-<div class="viewcode-block" id="MiniBatchGradientDescent"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.base.MiniBatchGradientDescent">[docs]</a><span class="k">class</span> <span class="nc">MiniBatchGradientDescent</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Mini batch gradient descent base implementation&quot;&quot;&quot;</span>
-
+<span class="k">class</span> <span class="nc">BaseSolver</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">costs_</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">plot_training</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_training</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">bias_</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
 
-<div class="viewcode-block" id="MiniBatchGradientDescent.fit"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.base.MiniBatchGradientDescent.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span> <span class="c1"># root__ endicates that that param belongs to model __dict__ not solver __dict__</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;root__&quot;</span><span class="p">):</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="mi">6</span><span class="p">:]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+
+<span class="k">class</span> <span class="nc">MiniBatchGradientDescent</span><span class="p">(</span><span class="n">BaseSolver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mini batch gradient descent base implementation&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MiniBatchGradientDescent</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">costs_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">plot_training</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_training</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Trains the model&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">m_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_classes_</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_classes_</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
         <span class="n">src</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
             <span class="n">print_epoch</span><span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">epochs</span><span class="p">)</span>
 
+            <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">steps_per_epoch_</span><span class="p">()):</span>
                 <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
                 <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient_step</span><span class="p">(</span><span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">)</span>
 
                 <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">y_b</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
-                <span class="n">print_step</span><span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">steps_per_epoch_</span><span class="p">(),</span> <span class="n">loss</span><span class="o">=</span><span class="n">loss</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">costs_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span></div>
+                <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MiniBatchGradientDescent.plot_training"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.base.MiniBatchGradientDescent.plot_training">[docs]</a>    <span class="k">def</span> <span class="nf">plot_training</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">losses</span><span class="p">)}</span>
+                <span class="n">print_step</span><span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">steps_per_epoch_</span><span class="p">(),</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">costs_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">losses</span><span class="p">))</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">handle_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">losses</span><span class="p">):</span>
+                <span class="k">return</span> <span class="c1"># end training loop</span>
+
+    <span class="k">def</span> <span class="nf">plot_training</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Plots training curves (loss over epochs)&quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">fitted</span><span class="p">,</span> <span class="s2">&quot;Call .fit() first.&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">costs_</span><span class="p">))),</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">costs_</span><span class="p">,</span> <span class="s2">&quot;r-&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;epoch&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Training loss over epoch&quot;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<div class="viewcode-block" id="MiniBatchGradientDescent.predict"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.base.MiniBatchGradientDescent.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: np.ndarray of predicted targets for X_b</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">X_b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span></div>
+        <span class="k">return</span> <span class="n">X_b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span>
 
-<div class="viewcode-block" id="MiniBatchGradientDescent.gradient_step"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.base.MiniBatchGradientDescent.gradient_step">[docs]</a>    <span class="k">def</span> <span class="nf">gradient_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">gradient_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Performs coefficients optimization.&quot;&quot;&quot;</span>
         <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
         <span class="n">const</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">learning_rate_</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">m_</span>
@@ -216,13 +243,24 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">-=</span> <span class="n">const</span> <span class="o">*</span> <span class="n">X_b</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span> <span class="o">-=</span> <span class="n">const</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">y_pred</span></div></div>
+        <span class="k">return</span> <span class="n">y_pred</span>
+    
+    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="c1"># root__ endicates that that param belongs to model __dict__ not solver __dict__</span>
+            <span class="s2">&quot;root__costs_&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">costs_</span><span class="p">,</span>
+            <span class="s2">&quot;root__bias_&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span><span class="p">,</span>
+            <span class="s2">&quot;root__coefs_&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span><span class="p">,</span>
+            <span class="s2">&quot;root__learning_rate_&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">learning_rate_</span><span class="p">,</span>
+            <span class="s2">&quot;root__loss&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span>
+        <span class="p">}</span>
 
 
-<div class="viewcode-block" id="BaseModel"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.base.BaseModel">[docs]</a><span class="k">class</span> <span class="nc">BaseModel</span><span class="p">:</span>
+<div class="viewcode-block" id="BaseModel"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.dumb.BaseModel">[docs]</a><span class="k">class</span> <span class="nc">BaseModel</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Base model, to work it needs to be provided with coefs\_, bias\_, solver\_ and loss function&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="BaseModel.plot"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.base.BaseModel.plot">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">()</span>
+<div class="viewcode-block" id="BaseModel.plot"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.dumb.BaseModel.plot">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">data_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">target_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates a 2D plot where x-axis is data_idx, and y-axis is target_idx. Plots both their value and prediction curve</span>
 
@@ -258,28 +296,31 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">target_classes_</span><span class="p">[</span><span class="n">target_idx</span><span class="p">])</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="BaseModel.evaluate"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.base.BaseModel.evaluate">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">()</span>
+<div class="viewcode-block" id="BaseModel.evaluate"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.dumb.BaseModel.evaluate">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Evaluates model on the ds according to loss and prints its score</span>
 <span class="sd">        </span>
 <span class="sd">        :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</span>
 <span class="sd">        :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics. If not provided, loss given on model initialization will be used</span>
 <span class="sd">        :params args, kwargs: will be passed to .predict()</span>
+<span class="sd">        :returns: score</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">loss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loss: </span><span class="si">{</span><span class="n">loss</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">(),</span> <span class="n">y_pred</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">(),</span> <span class="n">y_pred</span><span class="p">)</span>
+        <span class="n">print_info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">loss</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">score</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">loss</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="n">score</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="BaseModel.predict"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.base.BaseModel.predict">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;unsupervised&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="BaseModel.predict"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.dumb.BaseModel.predict">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;prediction&quot;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</span>
 <span class="sd">        :returns: 2D np.ndarray, where each culumn holds prediction for one of the targets</span>
 <span class="sd">        :raises: AssertionError if model is not fitted</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">assertion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Call .fit() first.&quot;</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitted</span><span class="p">,</span> <span class="s2">&quot;Call .fit() first.&quot;</span><span class="p">)</span>
 
         <span class="n">print_epoch</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span>
         <span class="n">y_pred</span> <span class="o">=</span> <span class="kc">None</span>
@@ -298,7 +339,7 @@
                 <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">y_pred</span><span class="p">,</span> <span class="n">y_pred_b</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">y_pred</span></div>
 
-<div class="viewcode-block" id="BaseModel.fit"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.base.BaseModel.fit">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">()</span>
+<div class="viewcode-block" id="BaseModel.fit"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.dumb.BaseModel.fit">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;&#39;Trains&#39; the model.</span>
 <span class="sd">        </span>
@@ -306,7 +347,19 @@
 <span class="sd">        :returns: self</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="BaseModel.get_params"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.dumb.BaseModel.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns dict of parameters allowing exact coping of a model&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BaseModel.set_params"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.dumb.BaseModel.set_params">[docs]</a>    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set params to model&#39;s and solver&#39;s dict</span>
+<span class="sd">        </span>
+<span class="sd">        :param dict params: dict of parameters, to indicate that they belong to solver name should start with &#39;root\_\_&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

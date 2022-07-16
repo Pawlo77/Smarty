@@ -28,7 +28,7 @@ def display_conf(conf, classes, display_names=False):
 # X - DataSet with specified target_classes_ or np.ndarray
 # y - np.ndarray, required if X is also np.ndarray and mode is "supervised"
 # mode - supervised or not (any other will be treated as unsupervised)
-def prepare_ds(mode="supervised"):
+def prepare_ds(mode="supervised", **super_kwargs):
     def wrapper(func):
         @wraps(func)
         def prepare(*args, **kwargs):
@@ -40,16 +40,29 @@ def prepare_ds(mode="supervised"):
             if mode == "supervised":
                 assertion(rest["ds"].target_classes_ is not None, "DataSet without specified target.")
 
-            if "batch_size" in kwargs:
-                rest["ds"].batch(kwargs["batch_size"])
-            if "repeat" in kwargs:
-                rest["ds"].repeat(kwargs["repeat"])
-            if "shuffle" in kwargs:
-                rest["ds"].shuffle(kwargs["shuffle"]) 
-            if "drop_reminder" in kwargs:
-                rest["ds"].drop_reminder_ = kwargs["drop_reminder"]
+            if mode != "prediction":
+                if "batch_size" in kwargs:
+                    rest["ds"].batch(kwargs["batch_size"])
+                if "repeat" in kwargs:
+                    rest["ds"].repeat(kwargs["repeat"])
+                if "shuffle" in kwargs:
+                    rest["ds"].shuffle(kwargs["shuffle"]) 
+                if "drop_reminder" in kwargs:
+                    rest["ds"].drop_reminder_ = kwargs["drop_reminder"]
+            
+            else:
+                shuffle = rest["ds"].shuffle_
+                batch_size = rest["ds"].batch_size_
+                rest["ds"].shuffle(False)
+                if "batch_size" in super_kwargs:
+                    rest["ds"].batch(super_kwargs["batch_size"])
 
-            return func(*args, **rest, **kwargs)
+            out = func(*args, **rest, **kwargs)
+
+            if mode == "prediction":
+                rest["ds"].shuffle(shuffle).batch(batch_size)
+            
+            return out
         return prepare
     return wrapper
     
@@ -82,3 +95,17 @@ def print_step(step, max_step, *args, **kwargs):
 
     if step == max_step:
         print("\n\n", end="")
+
+def print_info(info):
+    if not get_config("VERBOSE"):
+        return
+    print(info)
+
+# calls each callback found
+def handle_callbacks(root, kwargs, losses):
+    flag = True # marks whereas training can be continued
+
+    if "callbacks" in kwargs:
+        for callback in kwargs["callbacks"]:
+            flag = flag and callback(root, losses)
+    return flag

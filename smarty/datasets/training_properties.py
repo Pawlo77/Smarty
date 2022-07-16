@@ -22,6 +22,7 @@ class TrainingProperty:
         self.repeat_ = False
         self.shuffle_ = False
         self.drop_reminder_ = True
+        self.seed_ = 42
 
         # to navigate in _indices_ and to navigate from with data create indices
         self._start_batch_idx_ = self._start_shuffle_idx_ = 0
@@ -40,6 +41,7 @@ class TrainingProperty:
         new.batch_size_ = self.batch_size_
         new.repeat_ = self.repeat_
         new.shuffle_ = self.shuffle_
+        new.seed_ = self.seed_
         new.drop_reminder_ = self.drop_reminder_
         new.target_classes_ = self.target_classes_
         new.data_classes_ = self.data_classes_
@@ -98,6 +100,10 @@ class TrainingProperty:
             key = [key]
         elif isinstance(key, list | np.ndarray) and isinstance(key[0], str): #multiple class by names
             key = [self._get_idx(k) for k in key]
+
+        for idx in range(len(key)):
+            if key[idx] < 0:
+                key[idx] = self.get_shape_()[1] + key[idx]
 
         self.target_classes_ = key
         self.data_classes_ = [k for k in range(self.get_shape_()[1]) if k not in key] # set rest column as data_classes_

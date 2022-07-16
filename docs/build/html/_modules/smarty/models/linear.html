@@ -89,6 +89,8 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.datasets.html">smarty.datasets package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.metrics.html">smarty.metrics module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.callbacks.html">smarty.callbacks module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.preprocessing.html">smarty.preprocessing package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.config.html">smarty.config module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.errors.html">smarty.errors module</a></li>
@@ -162,9 +164,9 @@
 
 <span class="kn">from</span> <span class="nn">smarty.errors</span> <span class="kn">import</span> <span class="n">assertion</span>
 <span class="kn">from</span> <span class="nn">smarty.config</span> <span class="kn">import</span> <span class="n">temp_config</span>
-<span class="kn">from</span> <span class="nn">.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">accuracy</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">prepare_ds</span><span class="p">,</span> <span class="n">print_epoch</span><span class="p">,</span> <span class="n">print_step</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">MiniBatchGradientDescent</span><span class="p">,</span> <span class="n">BaseModel</span>
+<span class="kn">from</span> <span class="nn">smarty.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">accuracy</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">print_epoch</span><span class="p">,</span> <span class="n">print_step</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">MiniBatchGradientDescent</span><span class="p">,</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">BaseSolver</span>
 
 
 <span class="n">LINEAR_SOLVERS</span> <span class="o">=</span> <span class="p">(</span>
@@ -177,9 +179,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">NormalEqSolver</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
+<span class="k">class</span> <span class="nc">NormalEqSolver</span><span class="p">(</span><span class="n">BaseSolver</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NormalEqSolver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -201,21 +203,39 @@
         <span class="k">with</span> <span class="n">temp_config</span><span class="p">(</span><span class="n">VERBOSE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
             <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="n">print_step</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">(),</span> <span class="n">y_pred</span><span class="p">))</span>
+        <span class="n">kw</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">(),</span> <span class="n">y_pred</span><span class="p">)}</span>
+        <span class="n">print_step</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;root__bias_&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span><span class="p">,</span>
+            <span class="s2">&quot;root__coefs_&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span><span class="p">,</span>
+            <span class="s2">&quot;root__loss&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span>
+        <span class="p">}</span>
 
 
-<div class="viewcode-block" id="LinearSgdSolver"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LinearSgdSolver">[docs]</a><span class="k">class</span> <span class="nc">LinearSgdSolver</span><span class="p">(</span><span class="n">MiniBatchGradientDescent</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">LinearSgdSolver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+<span class="k">class</span> <span class="nc">LinearSgdSolver</span><span class="p">(</span><span class="n">MiniBatchGradientDescent</span><span class="p">):</span>
+    <span class="k">pass</span>
 
 
-<div class="viewcode-block" id="LogisticSgdSolver"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticSgdSolver">[docs]</a><span class="k">class</span> <span class="nc">LogisticSgdSolver</span><span class="p">(</span><span class="n">MiniBatchGradientDescent</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">LogisticSgdSolver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<div class="viewcode-block" id="LogisticSgdSolver.predict"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticSgdSolver.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">LogisticSgdSolver</span><span class="p">(</span><span class="n">MiniBatchGradientDescent</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">):</span>
         <span class="n">y_pred</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">y_pred</span><span class="p">)))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">y_pred</span><span class="p">)))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">PerceptronSolver</span><span class="p">(</span><span class="n">MiniBatchGradientDescent</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">):</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_b</span><span class="p">)</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y_pred</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">threshold_</span><span class="p">)</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">y_pred</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">unit8</span><span class="p">)</span>
+        <span class="n">y_pred</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">y_pred</span>
+
+    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+        <span class="n">params</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;root__threshold_&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">threshold_</span>
+        <span class="k">return</span> <span class="n">params</span>
 
 
 <div class="viewcode-block" id="LinearRegression"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LinearRegression">[docs]</a><span class="k">class</span> <span class="nc">LinearRegression</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
@@ -232,7 +252,9 @@
 <span class="sd">        If you are using solver=&quot;sgd&quot;, you can plot training curve via .plot_training() or see each eopch losses - list at .solver_.costs_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;mbgd&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;mbgd&quot;</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LinearRegression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
         <span class="n">assertion</span><span class="p">(</span><span class="n">solver</span> <span class="ow">in</span> <span class="n">LINEAR_SOLVERS</span><span class="p">,</span> <span class="s2">&quot;Solver unrecognised, see models.linear.LINEAR_SOLVERS to see defined one.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">&quot;mbgd&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span> <span class="o">=</span> <span class="n">LinearSgdSolver</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -248,12 +270,17 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">LinearRegression</span><span class="p">(</span>
             <span class="n">loss</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span>
-            <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sgd&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_</span><span class="p">,</span> <span class="n">SgdSolver</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;norm_eq&quot;</span><span class="p">,</span>
+            <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sgd&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_</span><span class="p">,</span> <span class="n">LinearSgdSolver</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;norm_eq&quot;</span><span class="p">,</span>
             <span class="n">learning_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_rate_</span>
-            <span class="p">)</span></div></div>
+            <span class="p">)</span></div>
 
+<div class="viewcode-block" id="LinearRegression.get_params"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LinearRegression.get_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;root__solver&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mbgd&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">solver_</span><span class="p">,</span> <span class="n">LinearSgdSolver</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;norm_eq&quot;</span>
+        <span class="k">return</span> <span class="n">params</span></div></div>
+    
 
-<div class="viewcode-block" id="LogisticRegression"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticRegression">[docs]</a><span class="k">class</span> <span class="nc">LogisticRegression</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<div class="viewcode-block" id="LogisticClassifier"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticClassifier">[docs]</a><span class="k">class</span> <span class="nc">LogisticClassifier</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Logistic binary classifier</span>
 
 <span class="sd">    :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</span>
@@ -261,14 +288,19 @@
 <span class="sd">    :var np.ndarray bias\_: model&#39;s bias term</span>
 <span class="sd">    :var np.ndarray coefs\_: model&#39;s coefficients</span>
 <span class="sd">    :var float learning_rate\_: model&#39;s learning rate</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        You can plot training curve via .plot_training() or see each eopch losses - list at .solver_.costs_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LogisticClassifier</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    
         <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span> <span class="o">=</span> <span class="n">LogisticSgdSolver</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate_</span> <span class="o">=</span> <span class="n">learning_rate</span>
 
-<div class="viewcode-block" id="LogisticRegression.fit"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticRegression.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="LogisticClassifier.fit"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticClassifier.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># make sure the target class is correct for binary classification</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">()</span>
         <span class="n">assertion</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Binary classifier can have only one class&quot;</span><span class="p">)</span>
@@ -277,15 +309,56 @@
 
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LogisticRegression.clean_copy"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticRegression.clean_copy">[docs]</a>    <span class="k">def</span> <span class="nf">clean_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="LogisticClassifier.clean_copy"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.LogisticClassifier.clean_copy">[docs]</a>    <span class="k">def</span> <span class="nf">clean_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: new unfited model with same parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">LogisticRegression</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">LogisticClassifier</span><span class="p">(</span>
             <span class="n">loss</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span>
             <span class="n">learning_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_rate_</span>
             <span class="p">)</span></div></div>
 
+
+<div class="viewcode-block" id="Perceptron"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.Perceptron">[docs]</a><span class="k">class</span> <span class="nc">Perceptron</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perceptron binary classifier</span>
+
+<span class="sd">    :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</span>
+<span class="sd">    :param float learning_rate: learning rate</span>
+<span class="sd">    :param float threshold: values higher than threshold will be classified as 1, rest as 0</span>
+<span class="sd">    :var np.ndarray bias\_: model&#39;s bias term</span>
+<span class="sd">    :var np.ndarray coefs\_: model&#39;s coefficients</span>
+<span class="sd">    :var float learning_rate\_: model&#39;s learning rate</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        You can plot training curve via .plot_training() or see each eopch losses - list at .solver_.costs_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Perceptron</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span> <span class="o">=</span> <span class="n">PerceptronSolver</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">learning_rate_</span> <span class="o">=</span> <span class="n">learning_rate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_</span> <span class="o">=</span> <span class="n">threshold</span>
+
+<div class="viewcode-block" id="Perceptron.fit"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.Perceptron.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># make sure the target class is correct for binary classification</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">()</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Binary classifier can have only one class&quot;</span><span class="p">)</span>
+        <span class="n">unique</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">unique</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;Target class must consist only of 0 and 1&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Perceptron.clean_copy"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.linear.Perceptron.clean_copy">[docs]</a>    <span class="k">def</span> <span class="nf">clean_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns: new unfited model with same parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Perceptron</span><span class="p">(</span>
+            <span class="n">loss</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">,</span>
+            <span class="n">learning_rate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_rate_</span><span class="p">,</span>
+            <span class="n">threshold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_</span>
+            <span class="p">)</span></div></div>
 </pre></div>
 
            </div>

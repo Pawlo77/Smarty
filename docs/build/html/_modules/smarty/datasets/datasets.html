@@ -89,6 +89,8 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.datasets.html">smarty.datasets package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.metrics.html">smarty.metrics module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.callbacks.html">smarty.callbacks module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.preprocessing.html">smarty.preprocessing package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.config.html">smarty.config module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.errors.html">smarty.errors module</a></li>
@@ -171,8 +173,12 @@
 <span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;List of int dtypes auto-detection will check, each one being a native np.dtype&quot;&quot;&quot;</span>
 
+<span class="c1"># dropped float16 whus of its low-accuracy</span>
+<span class="c1"># FLOAT_TYPES = (</span>
+<span class="c1">#     np.float16, np.float32, np.float64,</span>
+<span class="c1"># )</span>
 <span class="n">FLOAT_TYPES</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;List of float dtypes auto-detection will check, each one being a native np.dtype&quot;&quot;&quot;</span>
 
@@ -415,7 +421,9 @@
 
         <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">[</span><span class="n">key</span><span class="p">,</span> <span class="p">:]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix_</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">DataSet</span><span class="p">()</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">)</span></div>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">DataSet</span><span class="p">()</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">columns_</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtypes_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_copy</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new</span></div>
 
 <div class="viewcode-block" id="DataSet.add_c"><a class="viewcode-back" href="../../../smarty.datasets.html#smarty.datasets.datasets.DataSet.add_c">[docs]</a>    <span class="k">def</span> <span class="nf">add_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pos</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Adds column/s to a dataset</span>

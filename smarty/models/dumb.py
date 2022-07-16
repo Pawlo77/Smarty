@@ -1,11 +1,10 @@
-# note: dumb models does not support batching
-
 import numpy as np
 
 from smarty.errors import assertion
-from .utils import prepare_ds, print_epoch, print_step
+from smarty.metrics import mean_squared_error
+from .utils import print_epoch, print_step, prepare_ds
 from .api import evaluate_model
-from .metrics import mean_squared_error
+from .base import BaseSolver, BaseModel
 
 
 DUMB_SOLVERS = (
@@ -52,27 +51,16 @@ def evaluate_dumb(ds, metric=mean_squared_error, solver="random", *args, **kwarg
     return evaluate_model(ds, model, metric, *args, **kwargs)
 
 
-class RandomModel:
-    """For each target column, returns random value from it, classification only"""
-    def __init__(self, *args, **kwargs):
-        pass
-
-    @prepare_ds()
+class RandomSolver(BaseSolver):
     def fit(self, ds, *args, **kwargs): 
-        """'Trains' the model
-        
-        :param DataSet ds: a DataSet - data source, needs to have specified target classes
-        :returns: self
-        """
-        self.classes_ = [] # list of unique values for each target_class
+        self.root.classes_ = [] # list of unique values for each target_class
         
         print_epoch(1, 1)
         for n, idx in enumerate(ds.target_classes_):
             print_step(n + 1, len(ds.target_classes_))
-            self.classes_.append(np.unique(ds[idx]))
+            self.root.classes_.append(np.unique(ds[idx]))
         return self
-        
-    @prepare_ds(mode="unsupervised")
+
     def predict(self, ds, seed=42, *args, **kwargs):
         """
         :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()
@@ -80,15 +68,73 @@ class RandomModel:
         :returns: 2D np.ndarray, where each culumn holds prediction for one of the targets
         :raises: AssertionError if model is not fitted
         """
-        assertion(self.classes_ != [], "Call .fit() first.")
         np.random.seed(seed)
 
         predictions = [] # for each target class, random value from it
-        print_epoch(1, 1, "test")
-        for n, idx in enumerate(self.classes_):
-            print_step(n + 1, len(self.classes_))
+        for idx in self.root.classes_:
             predictions.append(np.random.choice(idx, len(ds)).reshape(-1, 1))
         return np.concatenate(predictions, axis=1)
+
+    def get_params(self):
+        return {
+            "root__classes_": self.root.classes_
+        }
+        
+
+class ZeroSolver(BaseSolver):
+    def fit(self, ds, *args, **kwargs):
+        self.root.classes_ = []
+
+        if self.mode_ == "classification":
+            return self._fit_classification(ds, **kwargs)
+        return self._fit_regression(ds, **kwargs)
+
+    # for classification return most common value
+    def _fit_classification(self, ds, *args, **kwargs):
+        print_epoch(1, 1)
+        for n, idx in enumerate(ds.target_classes_):
+            print_step(n + 1, len(ds.target_classes_))
+            self.root.classes_.append(max(set(ds[idx]), key=list(ds[idx]).count))
+        return self
+
+    # for regression return mean/median
+    def _fit_regression(self, ds, *args, **kwargs):
+        print_epoch(1, 1)
+        for n, idx in enumerate(ds.target_classes_):
+            print_step(n + 1, len(ds.target_classes_))
+            if self.mode_ == "regression_mean":
+                self.root.classes_.append(np.mean(ds[idx]))
+            else: # median
+                self.root.classes_.append(np.median(ds[idx]))
+        return self
+
+    def predict(self, ds, seed=42, *args, **kwargs):
+        """
+        :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()
+        :param int seed: seed for np.random.choice used by model
+        :returns: 2D np.ndarray, where each culumn holds prediction for one of the targets
+        :raises: AssertionError if model is not fitted
+        """
+        np.random.seed(seed)
+
+        predictions = [] # for each target class, our "predicted" value
+        for n, c in enumerate(self.root.classes_):
+            predictions.append(np.full(len(ds), c).reshape(-1, 1))
+        return np.concatenate(predictions, axis=1)
+
+    def get_params(self):
+        return {
+            "root__mode_": self.root.mode_,
+            "root__classes_": self.root.classes_,
+        }
+
+
+class RandomModel(BaseModel):
+    """For each target column, returns random value from it, classification only"""
+
+    def __init__(self, *args, **kwargs):
+        super(RandomModel, self).__init__(*args, **kwargs)
+        self.solver_ = RandomSolver(self)
 
     def clean_copy(self):
         """
@@ -98,46 +144,16 @@ class RandomModel:
 
 
 # for each target column, returns most common value from it
-class ZeroRuleModel:
+class ZeroRuleModel(BaseModel):
     """For each target column it returns predictions according to the rule defined by mode
     
     :param str mode: one of smarty.models.dumb.ZERO_MODES
     """
     def __init__(self, mode="classification", *args, **kwargs):
+        super(ZERO_MODES, self).__init__(*args, **kwargs)
         assertion(mode in ZERO_MODES, "Wrong mode provided, choose among smarty.models.dumb.ZERO_MODES")
         self.mode_ = mode
-
-    @prepare_ds()
-    def fit(self, ds, *args, **kwargs):
-        """'Trains' the model
-        
-        :param DataSet ds: a DataSet - data source, needs to have specified target classes
-        :returns: self
-        """
-        self.classes_ = []
-
-        if self.mode_ == "classification":
-            return self._fit_classification(ds, **kwargs)
-        return self._fit_regression(ds, **kwargs)
-
-    # returns 2D array, where each culumn holds prediction for one of the targets
-    @prepare_ds(mode="unsupervised")
-    def predict(self, ds, seed=42, *args, **kwargs):
-        """
-        :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()
-        :param int seed: seed for np.random.choice used by model
-        :returns: 2D np.ndarray, where each culumn holds prediction for one of the targets
-        :raises: AssertionError if model is not fitted
-        """
-        assertion(self.classes_ != [], "Call .fit() first.")
-        np.random.seed(seed)
-
-        print_epoch(1, 1, "test")
-        predictions = [] # for each target class, our "predicted" value
-        for n, c in enumerate(self.classes_):
-            print_step(n + 1, len(self.classes_))
-            predictions.append(np.full(len(ds), c).reshape(-1, 1))
-        return np.concatenate(predictions, axis=1)
+        self.solver_ = ZeroSolver(self)
 
     # returns new unfited model with same parameters
     def clean_copy(self):
@@ -145,23 +161,4 @@ class ZeroRuleModel:
         :returns: new unfited model with same parameters
         """
         return ZeroRuleModel(self.mode_)
-
-    # for classification return most common value
-    def _fit_classification(self, ds, *args, **kwargs):
-        print_epoch(1, 1)
-        for n, idx in enumerate(ds.target_classes_):
-            print_step(n + 1, len(ds.target_classes_))
-            self.classes_.append(max(set(ds[idx]), key=list(ds[idx]).count))
-        return self
-
-    # for regression return mean/median
-    def _fit_regression(self, ds, *args, **kwargs):
-        print_epoch(1, 1)
-        for n, idx in enumerate(ds.target_classes_):
-            print_step(n + 1, len(ds.target_classes_))
-            if self.mode_ == "regression_mean":
-                self.classes_.append(np.mean(ds[idx]))
-            else: # median
-                self.classes_.append(np.median(ds[idx]))
-        return self       
 

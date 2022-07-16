@@ -22,6 +22,8 @@ Documentation
       
       smarty.datasets
       smarty.models
+      smarty.metrics
+      smarty.callbacks
       smarty.preprocessing
       smarty.config
       smarty.errors

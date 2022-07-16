@@ -2,9 +2,9 @@ import numpy as np
 
 from smarty.errors import assertion
 from smarty.config import temp_config
-from .metrics import mean_squared_error, accuracy
-from .utils import prepare_ds, print_epoch, print_step
-from .base import MiniBatchGradientDescent, BaseModel
+from smarty.metrics import mean_squared_error, accuracy
+from .utils import print_epoch, print_step
+from .base import MiniBatchGradientDescent, BaseModel, BaseSolver
 
 
 LINEAR_SOLVERS = (
@@ -17,9 +17,9 @@ LINEAR_SOLVERS = (
 """
 
 
-class NormalEqSolver:
-    def __init__(self, root):
-        self.root = root
+class NormalEqSolver(BaseSolver):
+    def __init__(self, *args, **kwargs):
+        super(NormalEqSolver, self).__init__(*args, **kwargs)
         self.root.bias_ = None
         self.root.coefs_ = None
 
@@ -41,33 +41,39 @@ class NormalEqSolver:
         with temp_config(VERBOSE=False):
             y_pred = self.root.predict(ds, *args, **kwargs)
 
-        print_step(1, 1, loss=self.root.loss(ds.get_target_classes(), y_pred))
+        kw = {self.root.loss.__name__: self.root.loss(ds.get_target_classes(), y_pred)}
+        print_step(1, 1, **kw)
+
+    def get_params(self):
+        return {
+            "root__bias_": self.root.bias_,
+            "root__coefs_": self.root.coefs_,
+            "root__loss": self.root.loss,
+        }
 
 
 class LinearSgdSolver(MiniBatchGradientDescent):
-    def __init__(self, *args, **kwargs):
-        super(LinearSgdSolver, self).__init__(*args, **kwargs)
+    pass
 
 
 class LogisticSgdSolver(MiniBatchGradientDescent):
-    def __init__(self, *args, **kwargs):
-        super(LogisticSgdSolver, self).__init__(*args, **kwargs)
-
     def predict(self, X_b):
         y_pred = super().predict(X_b)
         return (1.0 / (1.0 + np.exp(-y_pred))).astype("i")
 
 
 class PerceptronSolver(MiniBatchGradientDescent):
-    def __init__(self, *args, **kwargs):
-        super(PerceptronSolver, self).__init__(*args, **kwargs)
-
     def predict(self, X_b):
         y_pred = super().predict(X_b)
         idxs = np.where(y_pred > self.root.threshold_)
-        y_pred = np.zeros(y_pred.shape)
+        y_pred = np.zeros(y_pred.shape, dtype=np.unit8)
         y_pred[idxs] = 1
         return y_pred
+
+    def get_params(self): 
+        params = super().get_params()
+        params["root__threshold_"] = self.root.threshold_
+        return params
 
 
 class LinearRegression(BaseModel):
@@ -84,7 +90,9 @@ class LinearRegression(BaseModel):
         If you are using solver="sgd", you can plot training curve via .plot_training() or see each eopch losses - list at .solver_.costs_
     """
 
-    def __init__(self, loss=mean_squared_error, solver="mbgd", learning_rate=0.0001):
+    def __init__(self, loss=mean_squared_error, solver="mbgd", learning_rate=0.0001, *args, **kwargs):
+        super(LinearRegression, self).__init__(*args, **kwargs)
+
         assertion(solver in LINEAR_SOLVERS, "Solver unrecognised, see models.linear.LINEAR_SOLVERS to see defined one.")
         if solver == "mbgd":
             self.solver_ = LinearSgdSolver(self)
@@ -100,12 +108,17 @@ class LinearRegression(BaseModel):
         """
         return LinearRegression(
             loss=self.loss,
-            solver="sgd" if isinstance(self.solver_, SgdSolver) else "norm_eq",
+            solver="sgd" if isinstance(self.solver_, LinearSgdSolver) else "norm_eq",
             learning_rate=self.learning_rate_
             )
 
+    def get_params(self):
+        params = super().get_params()
+        params["root__solver"] = "mbgd" if isinstance(self.solver_, LinearSgdSolver) else "norm_eq"
+        return params
+    
 
-class LogisticRegression(BaseModel):
+class LogisticClassifier(BaseModel):
     """Logistic binary classifier
 
     :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics
@@ -113,9 +126,14 @@ class LogisticRegression(BaseModel):
     :var np.ndarray bias\_: model's bias term
     :var np.ndarray coefs\_: model's coefficients
     :var float learning_rate\_: model's learning rate
+
+    .. note::
+        You can plot training curve via .plot_training() or see each eopch losses - list at .solver_.costs_
     """
 
-    def __init__(self, loss=accuracy, learning_rate=0.0001):
+    def __init__(self, loss=accuracy, learning_rate=0.0001, *args, **kwargs):
+        super(LogisticClassifier, self).__init__(*args, **kwargs)
+    
         self.loss = loss
         self.solver_ = LogisticSgdSolver(self)
         self.learning_rate_ = learning_rate
@@ -133,7 +151,7 @@ class LogisticRegression(BaseModel):
         """
         :returns: new unfited model with same parameters
         """
-        return LogisticRegression(
+        return LogisticClassifier(
             loss=self.loss,
             learning_rate=self.learning_rate_
             )
@@ -148,9 +166,14 @@ class Perceptron(BaseModel):
     :var np.ndarray bias\_: model's bias term
     :var np.ndarray coefs\_: model's coefficients
     :var float learning_rate\_: model's learning rate
+
+    .. note::
+        You can plot training curve via .plot_training() or see each eopch losses - list at .solver_.costs_
     """
 
-    def __init__(self, loss=accuracy, learning_rate=0.0001, threshold=0.1):
+    def __init__(self, loss=accuracy, learning_rate=0.0001, threshold=0., *args, **kwargs):
+        super(Perceptron, self).__init__(*args, **kwargs)
+
         self.loss = loss
         self.solver_ = PerceptronSolver(self)
         self.learning_rate_ = learning_rate
@@ -174,33 +197,3 @@ class Perceptron(BaseModel):
             learning_rate=self.learning_rate_,
             threshold=self.threshold_
             )
-
-    def seek_threshold(self, ds, min_t=0.0, max_t=1.0, bins=5, mode="max", *args, **kwargs):
-        """Trains itself and keeps coefs and bias with highest accuracy
-        
-        :param float min_t: minimum threshold value
-        :param float max_t: maximum threshold value
-        :param int bins: number of bins to check
-        :param str mode: 'max' - seeks for model with highest loss, 'min' - seeks for model with lowest loss
-        :returns: best found score (measurred via self.evaluate)
-        """
-        assertion(mode in ['max', 'min'], "Mode not recognized, allowed are 'min' or 'max'")
-
-        best_score = best_coefs = best_bias = best_threshold = None
-        for threshold in np.linspace(min_t, max_t, bins):
-            self.threshold_ = threshold
-            self.solver_ = PerceptronSolver(self)
-            
-            self.fit(ds, *args, **kwargs)
-            score = self.evaluate(ds, *args, **kwargs)
-
-            if best_score is None or (mode == "max" and score > best_score) or (mode == "min" and score < best_score):
-                best_threshold = threshold
-                best_score = score
-                best_coefs = self.coefs_
-                best_bias = self.bias_
-
-        self.coefs_ = best_coefs
-        self.bias_ = best_bias
-        self.threshold_ = best_threshold
-        return best_score

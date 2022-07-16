@@ -2,39 +2,64 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from smarty.errors import assertion
-from .utils import prepare_ds, print_epoch, print_step
+from .utils import prepare_ds, print_epoch, print_step, handle_callbacks, print_info
 
 
-class MiniBatchGradientDescent:
+class BaseSolver:
+    def __init__(self, root, *args, **kwargs):
+        self.root = root
+
+    def set_params(self, params):
+        for key, val in params.items(): # root__ endicates that that param belongs to model __dict__ not solver __dict__
+            if key.startswith("root__"):
+                key = key[6:]
+                self.root.__dict__[key] = val
+            else:
+                self.__dict__[key] = val
+
+    def get_params(self):
+        return {}
+
+
+class MiniBatchGradientDescent(BaseSolver):
     """Mini batch gradient descent base implementation"""
 
-    def __init__(self, root, *args, **kwargs):
-        root.costs_ = []
-        root.plot_training = self.plot_training
-        root.bias_ = None
-        root.coefs_ = None
-        self.root = root
+    def __init__(self, *args, **kwargs):
+        super(MiniBatchGradientDescent, self).__init__(*args, **kwargs)
+        self.root.costs_ = []
+        self.root.plot_training = self.plot_training
+        self.root.bias_ = None
+        self.root.coefs_ = None
 
     def fit(self, ds, epochs=10, *args, **kwargs):
         """Trains the model"""
         self.root.m_ = len(ds)
-        self.root.coefs_ = np.ones((len(ds.data_classes_), 1))
+        self.root.coefs_ = np.zeros((len(ds.data_classes_), 1))
         self.root.bias_ = np.zeros((1, 1))
 
         src = iter(ds)
         for epoch in range(epochs):
             print_epoch(epoch + 1, epochs)
 
+            losses = []
             for step in range(ds.steps_per_epoch_()):
                 X_b, y_b = next(src)
                 y_pred = self.gradient_step(X_b, y_b)
 
                 loss = self.root.loss(y_b, y_pred)
-                print_step(step + 1, ds.steps_per_epoch_(), loss=loss)
-            self.root.costs_.append(loss)
+                losses.append(loss)
+
+                kw = {self.root.loss.__name__: np.mean(losses)}
+                print_step(step + 1, ds.steps_per_epoch_(), **kw)
+            
+            self.root.costs_.append(np.mean(losses))
+            
+            if not handle_callbacks(self.root, kwargs, losses):
+                return # end training loop
 
     def plot_training(self):
         """Plots training curves (loss over epochs)"""
+        assertion(self.root.fitted, "Call .fit() first.")
         plt.figure(figsize=(8, 6))
         plt.plot(list(range(len(self.root.costs_))), self.root.costs_, "r-")
         plt.xlabel("epoch")
@@ -57,10 +82,21 @@ class MiniBatchGradientDescent:
         self.root.coefs_ -= const * X_b.T.dot(error)
         self.root.bias_ -= const * np.sum(error)
         return y_pred
+    
+    def get_params(self):
+        return { # root__ endicates that that param belongs to model __dict__ not solver __dict__
+            "root__costs_": self.root.costs_,
+            "root__bias_": self.root.bias_,
+            "root__coefs_": self.root.coefs_,
+            "root__learning_rate_": self.root.learning_rate_,
+            "root__loss": self.root.loss,
+        }
 
 
 class BaseModel:
     """Base model, to work it needs to be provided with coefs\_, bias\_, solver\_ and loss function"""
+    def __init__(self):
+        self.fitted = False
 
     @prepare_ds()
     def plot(self, ds, data_idx=0, target_idx=0, *args, **kwargs):
@@ -112,17 +148,17 @@ class BaseModel:
         if loss is None:
             loss = self.loss
         score = loss(ds.get_target_classes(), y_pred)
-        print(f"Loss: {score}.")
-        return score
+        print_info(f"{loss.__name__}: {score}.")
+        return {loss.__name__: score}
 
-    @prepare_ds(mode="unsupervised")
+    @prepare_ds(mode="prediction")
     def predict(self, ds, *args, **kwargs):
         """
         :param DataSet ds: a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()
         :returns: 2D np.ndarray, where each culumn holds prediction for one of the targets
         :raises: AssertionError if model is not fitted
         """
-        assertion(self.bias_ is not None, "Call .fit() first.")
+        assertion(self.fitted, "Call .fit() first.")
 
         print_epoch(1, 1, "test")
         y_pred = None
@@ -149,4 +185,16 @@ class BaseModel:
         :returns: self
         """
         self.solver_.fit(ds, *args, **kwargs)
+        self.fitted = True
         return self
+
+    def get_params(self):
+        """Returns dict of parameters allowing exact coping of a model"""
+        return self.solver_.get_params()
+
+    def set_params(self, params):
+        """Set params to model's and solver's dict
+        
+        :param dict params: dict of parameters, to indicate that they belong to solver name should start with 'root\_\_'
+        """
+        self.solver_.set_params(params)

@@ -1,6 +1,5 @@
-from smarty.datasets import DataSet, train_test_split, cross_val_split
+from smarty.datasets import train_test_split, cross_val_split
 from smarty.errors import assertion
-from .metrics import mean_squared_error
 
 
 SAMPLINGS_METHODS = (
@@ -9,8 +8,8 @@ SAMPLINGS_METHODS = (
 )
 """Available samplings method for auto model evaluation"""
 
-# accepts an unfitted model, trains it according to sampling_method and returns calculated metric
-def evaluate_model(ds, model, metric=mean_squared_error, sampling_method="train_test_split", *args, **kwargs):
+# accepts an unfitted model, trains it according to sampling_method and returns calculated score
+def evaluate_model(ds, model, sampling_method="train_test_split", *args, **kwargs):
     """Splits ds and trains the model according to sampling_method, than evaluates it also according to sampling_method
 
     :param DataSet ds: a DataSet - data source
@@ -28,11 +27,11 @@ def evaluate_model(ds, model, metric=mean_squared_error, sampling_method="train_
     assertion(sampling_method in SAMPLINGS_METHODS, "Sampling method not recognised, see models.api.SAMPLING_METHODS to see available one.")    
 
     if sampling_method == "train_test_split":
-        return _evaluate_train_test_split(ds, model, metric, *args, **kwargs)
+        return _evaluate_train_test_split(ds, model, *args, **kwargs)
     else: # "cross_val"
-        return _evaluate_cross_val_test_split(ds, model, metric, **kwargs)
+        return _evaluate_cross_val_test_split(ds, model, **kwargs)
 
-def _evaluate_cross_val_test_split(ds, model, metric, *args, **kwargs):
+def _evaluate_cross_val_test_split(ds, model, *args, **kwargs):
     if "drop_reminder" not in kwargs: 
         kwargs["drop_reminder"] = True
     
@@ -51,12 +50,11 @@ def _evaluate_cross_val_test_split(ds, model, metric, *args, **kwargs):
             train_ds.join(folds[idx], axis=0)
         
         history = cur_model.fit(train_ds, *args, **kwargs)
-        y_pred = cur_model.predict(test_ds, *args, **kwargs)
-        scores.append(metric(test_ds.get_target_classes(), y_pred))
+        score = cur_model.evaluate(test_ds, *args, **kwargs)
+        scores.append(score)
     return scores
 
-def _evaluate_train_test_split(ds, model, metric, *args, **kwargs):
+def _evaluate_train_test_split(ds, model, *args, **kwargs):
     train_ds, test_ds = train_test_split(ds, *args, **kwargs)
     history = model.fit(train_ds, *args, **kwargs)
-    y_pred = model.predict(test_ds, *args, **kwargs)
-    return metric(test_ds.get_target_classes(), y_pred)
+    return model.evaluate(test_ds, *args, **kwargs)

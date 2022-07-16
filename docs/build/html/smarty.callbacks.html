@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>smarty.errors module &mdash; Smarty 0.1 documentation</title>
+  <title>smarty.callbacks module &mdash; Smarty 0.1 documentation</title>
   
 
   
@@ -43,7 +43,8 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="smarty.config module" href="smarty.config.html" /> 
+    <link rel="next" title="smarty.preprocessing package" href="smarty.preprocessing.html" />
+    <link rel="prev" title="smarty.metrics module" href="smarty.metrics.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -92,10 +93,10 @@
 <li class="toctree-l1"><a class="reference internal" href="smarty.datasets.html">smarty.datasets package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smarty.models.html">smarty.models package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smarty.metrics.html">smarty.metrics module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="smarty.callbacks.html">smarty.callbacks module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">smarty.callbacks module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smarty.preprocessing.html">smarty.preprocessing package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smarty.config.html">smarty.config module</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">smarty.errors module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.errors.html">smarty.errors module</a></li>
 </ul>
 
             
@@ -144,13 +145,13 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>smarty.errors module</li>
+      <li>smarty.callbacks module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/smarty.errors.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/smarty.callbacks.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -163,21 +164,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="smarty-errors-module">
-<h1>smarty.errors module<a class="headerlink" href="#smarty-errors-module" title="Permalink to this heading">¶</a></h1>
-<p>Provides basic errors handling.</p>
-<span class="target" id="module-smarty.errors"></span><dl class="py function">
-<dt class="sig sig-object py" id="smarty.errors.assertion">
-<span class="sig-prename descclassname"><span class="pre">smarty.errors.</span></span><span class="sig-name descname"><span class="pre">assertion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/errors.html#assertion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.errors.assertion" title="Permalink to this definition">¶</a></dt>
-<dd><p>If condition is False, raises an AssertionError with message and exits a program.</p>
+  <section id="smarty-callbacks-module">
+<h1>smarty.callbacks module<a class="headerlink" href="#smarty-callbacks-module" title="Permalink to this heading">¶</a></h1>
+<p>Will be called after each training epoch, valid only for gradient descent models.</p>
+<span class="target" id="module-smarty.callbacks"></span><dl class="py class">
+<dt class="sig sig-object py" id="smarty.callbacks.EarlyStoping">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.callbacks.</span></span><span class="sig-name descname"><span class="pre">EarlyStoping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patience</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'min'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retrive_best</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/callbacks.html#EarlyStoping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.callbacks.EarlyStoping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Early stopping callback
+To implement custom rule, re-implement get_score method</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>condition</strong> – condition to evaluate</p></li>
-<li><p><strong>mess</strong> (<em>str</em>) – message that is raised by an AssertionError</p></li>
+<li><p><strong>patience</strong> (<em>int</em>) – Number of epochs to wait before stopping (from last impovement)</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) – ‘max’ - maxes loss, ‘min’ - minimalizes loss</p></li>
+<li><p><strong>retrive_best</strong> (<em>bool</em>) – Whether to overwrite models params with best one found</p></li>
+<li><p><strong>min_delta</strong> (<em>float</em>) – minimum loss change to be treated as imporvement</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.callbacks.EarlyStoping.get_score">
+<span class="sig-name descname"><span class="pre">get_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">losses</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/callbacks.html#EarlyStoping.get_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.callbacks.EarlyStoping.get_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns mean of losses</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>losses</strong> (<em>list</em>) – list of each each batch loss from gradient descent</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -188,7 +204,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="smarty.config.html" class="btn btn-neutral float-left" title="smarty.config module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="smarty.preprocessing.html" class="btn btn-neutral float-right" title="smarty.preprocessing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="smarty.metrics.html" class="btn btn-neutral float-left" title="smarty.metrics module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

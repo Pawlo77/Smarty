@@ -11,8 +11,12 @@ INT_TYPES = (
 )
 """List of int dtypes auto-detection will check, each one being a native np.dtype"""
 
+# dropped float16 whus of its low-accuracy
+# FLOAT_TYPES = (
+#     np.float16, np.float32, np.float64,
+# )
 FLOAT_TYPES = (
-    np.float16, np.float32, np.float64,
+    np.float32, np.float64,
 )
 """List of float dtypes auto-detection will check, each one being a native np.dtype"""
 
@@ -255,7 +259,9 @@ class DataSet(TrainingProperty, StatisticsProperty):
 
         dt = self.matrix_[key, :]
         self.matrix_ = np.delete(self.matrix_, key, axis=0)
-        return DataSet().from_object(dt, columns=self.columns_, dtypes=self.dtypes_)
+        new = DataSet().from_object(dt, columns=self.columns_, dtypes=self.dtypes_)
+        self.train_copy(new)
+        return new
 
     def add_c(self, c, columns=None, dtypes=None, pos=-1):
         """Adds column/s to a dataset

@@ -14,6 +14,7 @@ smarty.models.dumb module
    Dumb models does not support batching and doesn't have .evaluate() method implemented
 
 .. automodule:: smarty.models.dumb
+   :inherited-members:
    :members:
    :show-inheritance:
 
@@ -21,16 +22,17 @@ smarty.models.linear module
 ---------------------------
 
 .. automodule:: smarty.models.linear
+   :exclude-members: PerceptronSolver, LogisticSgdSolver, LinearSgdSolver
+   :inherited-members:
    :members:
    :show-inheritance:
 
-smarty.models.metrics module
-----------------------------
-.. note:: 
-   Each metric from there requires both y and y_pred as np.ndarray and returns calculated score
+smarty.models.tree module
+-------------------------
 
-.. automodule:: smarty.models.metrics
+.. automodule:: smarty.models.tree
    :members:
+   :inherited-members:
    :show-inheritance:
 
 smarty.models.utils module
@@ -44,5 +46,6 @@ smarty.models.base module
 --------------------------
 
 .. automodule:: smarty.models.base
+   :exclude-members: MiniBatchGradientDescent
    :members:
    :show-inheritance:

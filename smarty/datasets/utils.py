@@ -81,7 +81,7 @@ def cross_val_split(ds, folds=3, shuffle=True, seed=42, drop_reminder=False, *ar
     :param bool drop_reminder: if True last fold is skipped if not full
     :returns: list of DataSets, each one being seperate fold
     """
-    assertion(insinstance(folds, int) and isinstance(shuffle, bool) and insinstance(seed, int) and isinstance(drop_reminder, bool), "Wrong entry data provided")
+    assertion(isinstance(folds, int) and isinstance(shuffle, bool) and isinstance(seed, int) and isinstance(drop_reminder, bool), "Wrong entry data provided")
     assertion(folds >= 2, "Minimum number of folds is 2.")
     assertion(len(ds) > folds, "Number of folds exceeds length of dataset")
     indeces = np.arange(len(ds))

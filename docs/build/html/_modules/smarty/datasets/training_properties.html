@@ -89,6 +89,8 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.datasets.html">smarty.datasets package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.metrics.html">smarty.metrics module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.callbacks.html">smarty.callbacks module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.preprocessing.html">smarty.preprocessing package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.config.html">smarty.config module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.errors.html">smarty.errors module</a></li>
@@ -182,6 +184,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">repeat_</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drop_reminder_</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed_</span> <span class="o">=</span> <span class="mi">42</span>
 
         <span class="c1"># to navigate in _indices_ and to navigate from with data create indices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_start_batch_idx_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_shuffle_idx_</span> <span class="o">=</span> <span class="mi">0</span>
@@ -200,6 +203,7 @@
         <span class="n">new</span><span class="o">.</span><span class="n">batch_size_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_</span>
         <span class="n">new</span><span class="o">.</span><span class="n">repeat_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repeat_</span>
         <span class="n">new</span><span class="o">.</span><span class="n">shuffle_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">seed_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed_</span>
         <span class="n">new</span><span class="o">.</span><span class="n">drop_reminder_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_reminder_</span>
         <span class="n">new</span><span class="o">.</span><span class="n">target_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span>
         <span class="n">new</span><span class="o">.</span><span class="n">data_classes_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_classes_</span></div>
@@ -258,6 +262,10 @@
             <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span> <span class="c1">#multiple class by names</span>
             <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_idx</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">key</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">key</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">target_classes_</span> <span class="o">=</span> <span class="n">key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_classes_</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_shape_</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span> <span class="c1"># set rest column as data_classes_</span>

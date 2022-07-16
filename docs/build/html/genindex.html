@@ -89,6 +89,8 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="smarty.datasets.html">smarty.datasets package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.metrics.html">smarty.metrics module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.callbacks.html">smarty.callbacks module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smarty.preprocessing.html">smarty.preprocessing package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smarty.config.html">smarty.config module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smarty.errors.html">smarty.errors module</a></li>
@@ -200,7 +202,7 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smarty.models.html#smarty.models.metrics.accuracy">accuracy() (in module smarty.models.metrics)</a>
+      <li><a href="smarty.metrics.html#smarty.metrics.accuracy">accuracy() (in module smarty.metrics)</a>
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.datasets.DataSet.add_c">add_c() (smarty.datasets.datasets.DataSet method)</a>
 </li>
@@ -237,7 +239,9 @@
 </li>
         <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.clean_copy">(smarty.models.linear.LinearRegression method)</a>
 </li>
-        <li><a href="smarty.models.html#smarty.models.linear.LogisticRegression.clean_copy">(smarty.models.linear.LogisticRegression method)</a>
+        <li><a href="smarty.models.html#smarty.models.linear.LogisticClassifier.clean_copy">(smarty.models.linear.LogisticClassifier method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.Perceptron.clean_copy">(smarty.models.linear.Perceptron method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -246,7 +250,7 @@
 </li>
       <li><a href="smarty.config.html#smarty.config.config">config (in module smarty.config)</a>
 </li>
-      <li><a href="smarty.models.html#smarty.models.metrics.confusion_matrix">confusion_matrix() (in module smarty.models.metrics)</a>
+      <li><a href="smarty.metrics.html#smarty.metrics.confusion_matrix">confusion_matrix() (in module smarty.metrics)</a>
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.datasets.DataSet.copy">copy() (smarty.datasets.datasets.DataSet method)</a>
 </li>
@@ -259,6 +263,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smarty.datasets.html#smarty.datasets.datasets.DataSet">DataSet (class in smarty.datasets.datasets)</a>
+</li>
+      <li><a href="smarty.models.html#smarty.models.tree.DecisionTree">DecisionTree (class in smarty.models.tree)</a>
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.stats_properties.StatisticsProperty.descr_cat">descr_cat() (smarty.datasets.stats_properties.StatisticsProperty method)</a>
 </li>
@@ -280,10 +286,26 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="smarty.callbacks.html#smarty.callbacks.EarlyStoping">EarlyStoping (class in smarty.callbacks)</a>
+</li>
       <li><a href="smarty.datasets.html#smarty.datasets.datasets.DataSet.empty_">empty_() (smarty.datasets.datasets.DataSet method)</a>
 </li>
       <li><a href="smarty.models.html#smarty.models.base.BaseModel.evaluate">evaluate() (smarty.models.base.BaseModel method)</a>
+
+      <ul>
+        <li><a href="smarty.models.html#smarty.models.dumb.RandomModel.evaluate">(smarty.models.dumb.RandomModel method)</a>
 </li>
+        <li><a href="smarty.models.html#smarty.models.dumb.ZeroRuleModel.evaluate">(smarty.models.dumb.ZeroRuleModel method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.evaluate">(smarty.models.linear.LinearRegression method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.LogisticClassifier.evaluate">(smarty.models.linear.LogisticClassifier method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.Perceptron.evaluate">(smarty.models.linear.Perceptron method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.tree.DecisionTree.evaluate">(smarty.models.tree.DecisionTree method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smarty.models.html#smarty.models.dumb.evaluate_dumb">evaluate_dumb() (in module smarty.models.dumb)</a>
@@ -296,20 +318,24 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smarty.models.html#smarty.models.metrics.f1_score">f1_score() (in module smarty.models.metrics)</a>
+      <li><a href="smarty.metrics.html#smarty.metrics.f1_score">f1_score() (in module smarty.metrics)</a>
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.stats_properties.StatisticsProperty.fill_nan">fill_nan() (smarty.datasets.stats_properties.StatisticsProperty method)</a>
 </li>
       <li><a href="smarty.models.html#smarty.models.base.BaseModel.fit">fit() (smarty.models.base.BaseModel method)</a>
 
       <ul>
-        <li><a href="smarty.models.html#smarty.models.base.MiniBatchGradientDescent.fit">(smarty.models.base.MiniBatchGradientDescent method)</a>
-</li>
         <li><a href="smarty.models.html#smarty.models.dumb.RandomModel.fit">(smarty.models.dumb.RandomModel method)</a>
 </li>
         <li><a href="smarty.models.html#smarty.models.dumb.ZeroRuleModel.fit">(smarty.models.dumb.ZeroRuleModel method)</a>
 </li>
-        <li><a href="smarty.models.html#smarty.models.linear.LogisticRegression.fit">(smarty.models.linear.LogisticRegression method)</a>
+        <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.fit">(smarty.models.linear.LinearRegression method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.LogisticClassifier.fit">(smarty.models.linear.LogisticClassifier method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.Perceptron.fit">(smarty.models.linear.Perceptron method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.tree.DecisionTree.fit">(smarty.models.tree.DecisionTree method)</a>
 </li>
         <li><a href="smarty.preprocessing.html#smarty.preprocessing.categorical.OneHotEncoder.fit">(smarty.preprocessing.categorical.OneHotEncoder method)</a>
 </li>
@@ -342,15 +368,31 @@
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.get_data_classes">get_data_classes() (smarty.datasets.training_properties.TrainingProperty method)</a>
 </li>
+      <li><a href="smarty.datasets.html#smarty.datasets.datasets.DataSet.get_numerical">get_numerical() (smarty.datasets.datasets.DataSet method)</a>
+</li>
+      <li><a href="smarty.models.html#smarty.models.base.BaseModel.get_params">get_params() (smarty.models.base.BaseModel method)</a>
+
+      <ul>
+        <li><a href="smarty.models.html#smarty.models.dumb.RandomModel.get_params">(smarty.models.dumb.RandomModel method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.dumb.ZeroRuleModel.get_params">(smarty.models.dumb.ZeroRuleModel method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.get_params">(smarty.models.linear.LinearRegression method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.LogisticClassifier.get_params">(smarty.models.linear.LogisticClassifier method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.Perceptron.get_params">(smarty.models.linear.Perceptron method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.tree.DecisionTree.get_params">(smarty.models.tree.DecisionTree method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smarty.datasets.html#smarty.datasets.datasets.DataSet.get_numerical">get_numerical() (smarty.datasets.datasets.DataSet method)</a>
+      <li><a href="smarty.callbacks.html#smarty.callbacks.EarlyStoping.get_score">get_score() (smarty.callbacks.EarlyStoping method)</a>
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.datasets.DataSet.get_shape_">get_shape_() (smarty.datasets.datasets.DataSet method)</a>
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.get_target_classes">get_target_classes() (smarty.datasets.training_properties.TrainingProperty method)</a>
-</li>
-      <li><a href="smarty.models.html#smarty.models.base.MiniBatchGradientDescent.gradient_step">gradient_step() (smarty.models.base.MiniBatchGradientDescent method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -390,15 +432,11 @@
 </li>
       <li><a href="smarty.models.html#smarty.models.linear.LinearRegression">LinearRegression (class in smarty.models.linear)</a>
 </li>
-      <li><a href="smarty.models.html#smarty.models.linear.LinearSgdSolver">LinearSgdSolver (class in smarty.models.linear)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="smarty.datasets.html#smarty.datasets.utils.load_data">load_data() (in module smarty.datasets.utils)</a>
 </li>
-      <li><a href="smarty.models.html#smarty.models.linear.LogisticRegression">LogisticRegression (class in smarty.models.linear)</a>
-</li>
-      <li><a href="smarty.models.html#smarty.models.linear.LogisticSgdSolver">LogisticSgdSolver (class in smarty.models.linear)</a>
+      <li><a href="smarty.models.html#smarty.models.linear.LogisticClassifier">LogisticClassifier (class in smarty.models.linear)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -406,14 +444,14 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smarty.models.html#smarty.models.metrics.mean_squared_error">mean_squared_error() (in module smarty.models.metrics)</a>
-</li>
-      <li><a href="smarty.models.html#smarty.models.base.MiniBatchGradientDescent">MiniBatchGradientDescent (class in smarty.models.base)</a>
+      <li><a href="smarty.metrics.html#smarty.metrics.mean_squared_error">mean_squared_error() (in module smarty.metrics)</a>
 </li>
       <li>
     module
 
       <ul>
+        <li><a href="smarty.callbacks.html#module-smarty.callbacks">smarty.callbacks</a>
+</li>
         <li><a href="smarty.config.html#module-smarty.config">smarty.config</a>
 </li>
         <li><a href="smarty.datasets.html#module-smarty.datasets.datasets">smarty.datasets.datasets</a>
@@ -426,6 +464,8 @@
 </li>
         <li><a href="smarty.errors.html#module-smarty.errors">smarty.errors</a>
 </li>
+        <li><a href="smarty.metrics.html#module-smarty.metrics">smarty.metrics</a>
+</li>
         <li><a href="smarty.models.html#module-smarty.models.api">smarty.models.api</a>
 </li>
         <li><a href="smarty.models.html#module-smarty.models.base">smarty.models.base</a>
@@ -434,7 +474,7 @@
 </li>
         <li><a href="smarty.models.html#module-smarty.models.linear">smarty.models.linear</a>
 </li>
-        <li><a href="smarty.models.html#module-smarty.models.metrics">smarty.models.metrics</a>
+        <li><a href="smarty.models.html#module-smarty.models.tree">smarty.models.tree</a>
 </li>
         <li><a href="smarty.models.html#module-smarty.models.utils">smarty.models.utils</a>
 </li>
@@ -469,22 +509,44 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="smarty.models.html#smarty.models.linear.Perceptron">Perceptron (class in smarty.models.linear)</a>
+</li>
       <li><a href="smarty.models.html#smarty.models.base.BaseModel.plot">plot() (smarty.models.base.BaseModel method)</a>
+
+      <ul>
+        <li><a href="smarty.models.html#smarty.models.dumb.RandomModel.plot">(smarty.models.dumb.RandomModel method)</a>
 </li>
-      <li><a href="smarty.models.html#smarty.models.base.MiniBatchGradientDescent.plot_training">plot_training() (smarty.models.base.MiniBatchGradientDescent method)</a>
+        <li><a href="smarty.models.html#smarty.models.dumb.ZeroRuleModel.plot">(smarty.models.dumb.ZeroRuleModel method)</a>
 </li>
-      <li><a href="smarty.models.html#smarty.models.metrics.precision">precision() (in module smarty.models.metrics)</a>
+        <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.plot">(smarty.models.linear.LinearRegression method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.LogisticClassifier.plot">(smarty.models.linear.LogisticClassifier method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.Perceptron.plot">(smarty.models.linear.Perceptron method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.tree.DecisionTree.plot">(smarty.models.tree.DecisionTree method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="smarty.models.html#smarty.models.tree.DecisionTree.plot_tree">plot_tree() (smarty.models.tree.DecisionTree method)</a>
+</li>
+      <li><a href="smarty.metrics.html#smarty.metrics.precision">precision() (in module smarty.metrics)</a>
 </li>
       <li><a href="smarty.models.html#smarty.models.base.BaseModel.predict">predict() (smarty.models.base.BaseModel method)</a>
 
       <ul>
-        <li><a href="smarty.models.html#smarty.models.base.MiniBatchGradientDescent.predict">(smarty.models.base.MiniBatchGradientDescent method)</a>
-</li>
         <li><a href="smarty.models.html#smarty.models.dumb.RandomModel.predict">(smarty.models.dumb.RandomModel method)</a>
 </li>
         <li><a href="smarty.models.html#smarty.models.dumb.ZeroRuleModel.predict">(smarty.models.dumb.ZeroRuleModel method)</a>
 </li>
-        <li><a href="smarty.models.html#smarty.models.linear.LogisticSgdSolver.predict">(smarty.models.linear.LogisticSgdSolver method)</a>
+        <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.predict">(smarty.models.linear.LinearRegression method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.LogisticClassifier.predict">(smarty.models.linear.LogisticClassifier method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.Perceptron.predict">(smarty.models.linear.Perceptron method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.tree.DecisionTree.predict">(smarty.models.tree.DecisionTree method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -493,17 +555,17 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smarty.models.html#smarty.models.metrics.r_squared">r_squared() (in module smarty.models.metrics)</a>
+      <li><a href="smarty.metrics.html#smarty.metrics.r_squared">r_squared() (in module smarty.metrics)</a>
 </li>
       <li><a href="smarty.models.html#smarty.models.dumb.RandomModel">RandomModel (class in smarty.models.dumb)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="smarty.models.html#smarty.models.metrics.recall">recall() (in module smarty.models.metrics)</a>
+      <li><a href="smarty.metrics.html#smarty.metrics.recall">recall() (in module smarty.metrics)</a>
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.repeat">repeat() (smarty.datasets.training_properties.TrainingProperty method)</a>
 </li>
-      <li><a href="smarty.models.html#smarty.models.metrics.root_mean_squared_error">root_mean_squared_error() (in module smarty.models.metrics)</a>
+      <li><a href="smarty.metrics.html#smarty.metrics.root_mean_squared_error">root_mean_squared_error() (in module smarty.metrics)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -515,10 +577,33 @@
 </li>
       <li><a href="smarty.config.html#smarty.config.set_config">set_config() (in module smarty.config)</a>
 </li>
+      <li><a href="smarty.models.html#smarty.models.base.BaseModel.set_params">set_params() (smarty.models.base.BaseModel method)</a>
+
+      <ul>
+        <li><a href="smarty.models.html#smarty.models.dumb.RandomModel.set_params">(smarty.models.dumb.RandomModel method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.dumb.ZeroRuleModel.set_params">(smarty.models.dumb.ZeroRuleModel method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.LinearRegression.set_params">(smarty.models.linear.LinearRegression method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.LogisticClassifier.set_params">(smarty.models.linear.LogisticClassifier method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.linear.Perceptron.set_params">(smarty.models.linear.Perceptron method)</a>
+</li>
+        <li><a href="smarty.models.html#smarty.models.tree.DecisionTree.set_params">(smarty.models.tree.DecisionTree method)</a>
+</li>
+      </ul></li>
       <li><a href="smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.set_target_classes">set_target_classes() (smarty.datasets.training_properties.TrainingProperty method)</a>
 </li>
       <li><a href="smarty.datasets.html#smarty.datasets.training_properties.TrainingProperty.shuffle">shuffle() (smarty.datasets.training_properties.TrainingProperty method)</a>
 </li>
+      <li>
+    smarty.callbacks
+
+      <ul>
+        <li><a href="smarty.callbacks.html#module-smarty.callbacks">module</a>
+</li>
+      </ul></li>
       <li>
     smarty.config
 
@@ -554,11 +639,20 @@
         <li><a href="smarty.datasets.html#module-smarty.datasets.utils">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     smarty.errors
 
       <ul>
         <li><a href="smarty.errors.html#module-smarty.errors">module</a>
+</li>
+      </ul></li>
+      <li>
+    smarty.metrics
+
+      <ul>
+        <li><a href="smarty.metrics.html#module-smarty.metrics">module</a>
 </li>
       </ul></li>
       <li>
@@ -568,8 +662,6 @@
         <li><a href="smarty.models.html#module-smarty.models.api">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     smarty.models.base
 
@@ -592,10 +684,10 @@
 </li>
       </ul></li>
       <li>
-    smarty.models.metrics
+    smarty.models.tree
 
       <ul>
-        <li><a href="smarty.models.html#module-smarty.models.metrics">module</a>
+        <li><a href="smarty.models.html#module-smarty.models.tree">module</a>
 </li>
       </ul></li>
       <li>

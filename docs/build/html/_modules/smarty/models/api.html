@@ -89,6 +89,8 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.datasets.html">smarty.datasets package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.metrics.html">smarty.metrics module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.callbacks.html">smarty.callbacks module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.preprocessing.html">smarty.preprocessing package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.config.html">smarty.config module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.errors.html">smarty.errors module</a></li>
@@ -158,9 +160,9 @@
            <div itemprop="articleBody">
             
   <h1>Source code for smarty.models.api</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">smarty.datasets</span> <span class="kn">import</span> <span class="n">DataSet</span><span class="p">,</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">cross_val_split</span>
+<span></span><span class="kn">from</span> <span class="nn">smarty.datasets</span> <span class="kn">import</span> <span class="n">train_test_split</span><span class="p">,</span> <span class="n">cross_val_split</span>
 <span class="kn">from</span> <span class="nn">smarty.errors</span> <span class="kn">import</span> <span class="n">assertion</span>
-<span class="kn">from</span> <span class="nn">.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="kn">from</span> <span class="nn">smarty.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
 
 
 <span class="n">SAMPLINGS_METHODS</span> <span class="o">=</span> <span class="p">(</span>
@@ -169,8 +171,8 @@
 <span class="p">)</span>
 <span class="sd">&quot;&quot;&quot;Available samplings method for auto model evaluation&quot;&quot;&quot;</span>
 
-<span class="c1"># accepts an unfitted model, trains it according to sampling_method and returns calculated metric</span>
-<div class="viewcode-block" id="evaluate_model"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.api.evaluate_model">[docs]</a><span class="k">def</span> <span class="nf">evaluate_model</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">sampling_method</span><span class="o">=</span><span class="s2">&quot;train_test_split&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="c1"># accepts an unfitted model, trains it according to sampling_method and returns calculated score</span>
+<div class="viewcode-block" id="evaluate_model"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.api.evaluate_model">[docs]</a><span class="k">def</span> <span class="nf">evaluate_model</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">sampling_method</span><span class="o">=</span><span class="s2">&quot;train_test_split&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Splits ds and trains the model according to sampling_method, than evaluates it also according to sampling_method</span>
 
 <span class="sd">    :param DataSet ds: a DataSet - data source</span>
@@ -188,11 +190,11 @@
     <span class="n">assertion</span><span class="p">(</span><span class="n">sampling_method</span> <span class="ow">in</span> <span class="n">SAMPLINGS_METHODS</span><span class="p">,</span> <span class="s2">&quot;Sampling method not recognised, see models.api.SAMPLING_METHODS to see available one.&quot;</span><span class="p">)</span>    
 
     <span class="k">if</span> <span class="n">sampling_method</span> <span class="o">==</span> <span class="s2">&quot;train_test_split&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_evaluate_train_test_split</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_evaluate_train_test_split</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span> <span class="c1"># &quot;cross_val&quot;</span>
-        <span class="k">return</span> <span class="n">_evaluate_cross_val_test_split</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_evaluate_cross_val_test_split</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<span class="k">def</span> <span class="nf">_evaluate_cross_val_test_split</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_evaluate_cross_val_test_split</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">if</span> <span class="s2">&quot;drop_reminder&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span> 
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;drop_reminder&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
     
@@ -201,7 +203,7 @@
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">folds</span><span class="p">)):</span> <span class="c1"># at each iteration different fold is marked as target one </span>
         <span class="n">test_ds</span> <span class="o">=</span> <span class="n">folds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">cur_model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">clean_copy</span><span class="p">()</span> <span class="c1"># copy original unfitted model</span>
+        <span class="c1"># cur_model = model.clean_copy() # copy original unfitted model</span>
         <span class="n">training_indeces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">folds</span><span class="p">)))</span>
         <span class="n">training_indeces</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="c1"># drop current test_ds</span>
         
@@ -210,16 +212,15 @@
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">training_indeces</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
             <span class="n">train_ds</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">folds</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         
-        <span class="n">history</span> <span class="o">=</span> <span class="n">cur_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">cur_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metric</span><span class="p">(</span><span class="n">test_ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">(),</span> <span class="n">y_pred</span><span class="p">))</span>
+        <span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">scores</span>
 
-<span class="k">def</span> <span class="nf">_evaluate_train_test_split</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_evaluate_train_test_split</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">train_ds</span><span class="p">,</span> <span class="n">test_ds</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">metric</span><span class="p">(</span><span class="n">test_ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">(),</span> <span class="n">y_pred</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 
            </div>
