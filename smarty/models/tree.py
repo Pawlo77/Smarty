@@ -3,6 +3,7 @@ import pydot
 
 from smarty.errors import assertion
 from smarty.metrics import accuracy
+from smarty.config import temp_config
 from .utils import print_epoch, print_step, print_info
 from .base import BaseSolver, BaseModel
 
@@ -22,12 +23,15 @@ class DecisionNode:
     def __str__(self):
         return f"'{self.col}' < {self.condition}\n gini: {self.gini}\n samples: {self.samples}"
 
+    def __hash__(self):
+        return hash(str(self.gini + self.samples + self.condition))
+
 
 class TerminalNode:
     def __init__(self, ds, gini, samples):
         targets = ds.get_target_classes()
         distribs = [np.unique(targets[:, idx], return_counts=True) for idx in range(len(ds.target_classes_))]
-        self.target = [sorted(zip(u, c), key=lambda x: x[1], reverse=True)[0][0] for u, c in distribs]
+        self.target = tuple(sorted(zip(u, c), key=lambda x: x[1], reverse=True)[0][0] for u, c in distribs)
 
         self.gini = gini
         self.samples = samples
@@ -38,6 +42,9 @@ class TerminalNode:
 
     def __str__(self):
         return f"Class '{self.target}'\n gini: {self.gini}\n samples: {self.samples}"
+
+    def __hash__(self):
+        return hash(str(self.gini + self.samples) + str(self.target))
 
 
 class DecisionTreeSolver(BaseSolver):
@@ -92,24 +99,27 @@ class DecisionTreeSolver(BaseSolver):
         node = self.create_node(ds, depth, gini, col, condition, *splits)
 
         if not isinstance(node, TerminalNode):
-            node.left = self.create_tree(node.left, depth + 1)
-            node.right = self.create_tree(node.right, depth + 1)
-        return node
+            node.left, left_targets = self.create_tree(node.left, depth + 1)
+            node.right, right_targets = self.create_tree(node.right, depth + 1)
+
+            if left_targets == right_targets and len(left_targets) == 1:
+                node = TerminalNode(ds, gini, len(ds)) # change node to terminal node chance all its childs predicts same target
+                return node, set((node.target, ))
+            return node, left_targets.union(right_targets)
+        else:
+            return node, set((node.target, ))
     
     def fit(self, ds, *args, **kwargs):
-        root_gini, root_col, root_condition, root_splits = self.get_split(ds)
-        depth = 1
         print_epoch(1, 1)
         print_step(0, 1)
+        self.root.root_node_, _ = self.create_tree(ds, 1)
 
-        self.root.root_node_ = self.create_node(ds, depth, root_gini, root_col, root_condition, *root_splits)
-        if not isinstance(self.root, TerminalNode):
-            self.root.root_node_.left = self.create_tree(self.root.root_node_.left, depth + 1)
-            self.root.root_node_.right = self.create_tree(self.root.root_node_.right, depth + 1)
-
-        self.root.fitted = True
-        y_pred = self.root.predict(ds)
-        kw = {self.root.loss.__name__: self.root.loss(ds.get_target_classes(), y_pred)}
+        # turn of verbose for predicting the training performance
+        kw = {}
+        with temp_config(VERBOSE=False): 
+            self.root.fitted = True
+            y_pred = self.root.predict(ds)
+            kw[self.root.loss.__name__] = self.root.loss(ds.get_target_classes(), y_pred)
         print_step(1, 1, **kw)
 
     def predict(self, x_b, *args, **kwargs):
@@ -134,18 +144,22 @@ class DecisionTreeSolver(BaseSolver):
             self.copy_branch(root_node.right, root_node_copy.right)
 
     def get_params(self):
+        kw = super().get_params()
+
         root_node_copy = self.root.root_node_.copy()
         self.copy_branch(self.root.root_node_, root_node_copy)
-        return {
+        return kw.update({
             "root__root_node_": self.root.root_node_,
             "root__max_depth_": self.root.max_depth_,
             "root__min_samples_": self.root.min_samples_,
             "root_loss": self.root.loss
-        }
+        })
 
 
 class DecisionTree(BaseModel):
-    """
+    """Decision tree model
+    
+    :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics
     :param int max_depth: maximum number of splits
     :param int min_samples: minimum number of samples each split must have
     """
@@ -164,9 +178,9 @@ class DecisionTree(BaseModel):
 
         def helper(root_node, node, label=""):
             if isinstance(node, TerminalNode):
-                graph_node = pydot.Node(str(node), label=str(node), shape="box", style="filled")
+                graph_node = pydot.Node(hash(node), label=str(node), shape="box", style="filled")
             else:
-                graph_node = pydot.Node(str(node), label=str(node), shape="box")
+                graph_node = pydot.Node(hash(node), label=str(node), shape="box")
         
             graph.add_node(graph_node)
             graph.add_edge(pydot.Edge(root_node, graph_node, label=label))
@@ -175,11 +189,11 @@ class DecisionTree(BaseModel):
                 helper(graph_node, node.left)
                 helper(graph_node, node.right)
         
-        graph_node = pydot.Node(str(self.root_node), label=str(self.root_node), shape="box")
+        graph_node = pydot.Node(hash(self.root_node_), label=str(self.root_node_), shape="box")
         graph.add_node(graph_node)
-        if not isinstance(self.root_node, TerminalNode):
-            helper(graph_node, self.root_node.left, label="Yes")
-            helper(graph_node, self.root_node.right, label="No")
+        if not isinstance(self.root_node_, TerminalNode):
+            helper(graph_node, self.root_node_.left, label="Yes")
+            helper(graph_node, self.root_node_.right, label="No")
     
         print_info(f"Saving plot to '{name}.png'")
         graph.write_png(f"{name}.png")

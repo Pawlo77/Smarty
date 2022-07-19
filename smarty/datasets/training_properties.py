@@ -175,7 +175,7 @@ class TrainingProperty:
             return step_indeces
 
         max_idx_ = len(self) # number of rows in dataset
-        indeces_size = self.shuffle_ if self.shuffle_ is not False else 1000 # how large indeces we want to be
+        indeces_size = self.shuffle_ if self.shuffle_ is not False else 900 # how large indeces we want to be, be aware of maximum recursion depth!!!
         self._indeces_ = generate_helper(self._start_shuffle_idx_, max_idx_, indeces_size)
         
         self._start_shuffle_idx_ = self._indeces_[-1] + 1

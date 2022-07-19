@@ -1,8 +1,5 @@
 import numpy as np
 
-from smarty.errors import assertion
-from smarty.datasets import DataSet
-
 # each function from there requires data as np.ndarray
 # tested only against y, y_pred being 1D arrays
 

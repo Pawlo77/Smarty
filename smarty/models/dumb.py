@@ -2,7 +2,7 @@ import numpy as np
 
 from smarty.errors import assertion
 from smarty.metrics import mean_squared_error
-from .utils import print_epoch, print_step, prepare_ds
+from .utils import print_epoch, print_step
 from .api import evaluate_model
 from .base import BaseSolver, BaseModel
 
@@ -76,9 +76,11 @@ class RandomSolver(BaseSolver):
         return np.concatenate(predictions, axis=1)
 
     def get_params(self):
-        return {
+        kw = super().get_params()
+
+        return kw.update({
             "root__classes_": self.root.classes_
-        }
+        })
         
 
 class ZeroSolver(BaseSolver):
@@ -123,10 +125,12 @@ class ZeroSolver(BaseSolver):
         return np.concatenate(predictions, axis=1)
 
     def get_params(self):
-        return {
+        kw = super().get_params()
+
+        return kw.update({
             "root__mode_": self.root.mode_,
             "root__classes_": self.root.classes_,
-        }
+        })
 
 
 class RandomModel(BaseModel):

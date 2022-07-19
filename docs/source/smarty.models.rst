@@ -35,6 +35,14 @@ smarty.models.tree module
    :inherited-members:
    :show-inheritance:
 
+smarty.models.naive module
+--------------------------
+
+.. automodule:: smarty.models.naive
+   :members:
+   :inherited-members:
+   :show-inheritance:
+
 smarty.models.utils module
 --------------------------
 

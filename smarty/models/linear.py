@@ -37,19 +37,24 @@ class NormalEqSolver(BaseSolver):
         self.root.coefs_ = all_[1:]
         self.root.bias_ = all_[0]
 
-        # turn of verbose for predicting the training performance
+        # turn off verbose for predicting the training performance
+        kw = {}
         with temp_config(VERBOSE=False):
             y_pred = self.root.predict(ds, *args, **kwargs)
-
-        kw = {self.root.loss.__name__: self.root.loss(ds.get_target_classes(), y_pred)}
+            kw[self.root.loss.__name__] = self.root.loss(ds.get_target_classes(), y_pred)
         print_step(1, 1, **kw)
 
     def get_params(self):
-        return {
+        kw = super().get_params()
+
+        return kw.update({
             "root__bias_": self.root.bias_,
             "root__coefs_": self.root.coefs_,
             "root__loss": self.root.loss,
-        }
+        })
+
+    def predict(self, X_b, *args, **kwargs):
+        return X_b.dot(self.root.coefs_) + self.root.bias_
 
 
 class LinearSgdSolver(MiniBatchGradientDescent):

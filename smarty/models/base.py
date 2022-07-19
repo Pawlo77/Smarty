@@ -18,7 +18,7 @@ class BaseSolver:
                 self.__dict__[key] = val
 
     def get_params(self):
-        return {}
+        return {"root_fitted": self.root.fitted}
 
 
 class MiniBatchGradientDescent(BaseSolver):
@@ -32,7 +32,6 @@ class MiniBatchGradientDescent(BaseSolver):
         self.root.coefs_ = None
 
     def fit(self, ds, epochs=10, *args, **kwargs):
-        """Trains the model"""
         self.root.m_ = len(ds)
         self.root.coefs_ = np.zeros((len(ds.data_classes_), 1))
         self.root.bias_ = np.zeros((1, 1))
@@ -67,10 +66,7 @@ class MiniBatchGradientDescent(BaseSolver):
         plt.title("Training loss over epoch")
         plt.show()
 
-    def predict(self, X_b):
-        """
-        :returns: np.ndarray of predicted targets for X_b
-        """
+    def predict(self, X_b, *args, **kwargs):
         return X_b.dot(self.root.coefs_) + self.root.bias_
 
     def gradient_step(self, X_b, y_b):
@@ -168,7 +164,7 @@ class BaseModel:
             if ds.target_classes_ is not None:
                 x_b = x_b[0] # drop target
 
-            y_pred_b = self.solver_.predict(x_b)
+            y_pred_b = self.solver_.predict(x_b, *args, **kwargs)
             print_step(step + 1, ds.steps_per_epoch_())
 
             if y_pred is None:

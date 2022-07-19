@@ -40,27 +40,28 @@ def prepare_ds(mode="supervised", **super_kwargs):
             if mode == "supervised":
                 assertion(rest["ds"].target_classes_ is not None, "DataSet without specified target.")
 
-            if mode != "prediction":
-                if "batch_size" in kwargs:
-                    rest["ds"].batch(kwargs["batch_size"])
-                if "repeat" in kwargs:
-                    rest["ds"].repeat(kwargs["repeat"])
-                if "shuffle" in kwargs:
-                    rest["ds"].shuffle(kwargs["shuffle"]) 
-                if "drop_reminder" in kwargs:
-                    rest["ds"].drop_reminder_ = kwargs["drop_reminder"]
+            if "batch_size" in kwargs:
+                rest["ds"].batch(kwargs["batch_size"])
+            if "repeat" in kwargs:
+                rest["ds"].repeat(kwargs["repeat"])
+            if "shuffle" in kwargs:
+                rest["ds"].shuffle(kwargs["shuffle"]) 
+            if "drop_reminder" in kwargs:
+                rest["ds"].drop_reminder_ = kwargs["drop_reminder"]
             
-            else:
+            batch_size = rest["ds"].batch_size_
+            if "batch_size" in super_kwargs:
+                rest["ds"].batch(super_kwargs["batch_size"])
+
+            if mode == "prediction":
                 shuffle = rest["ds"].shuffle_
-                batch_size = rest["ds"].batch_size_
                 rest["ds"].shuffle(False)
-                if "batch_size" in super_kwargs:
-                    rest["ds"].batch(super_kwargs["batch_size"])
 
             out = func(*args, **rest, **kwargs)
 
             if mode == "prediction":
-                rest["ds"].shuffle(shuffle).batch(batch_size)
+                rest["ds"].shuffle(shuffle)
+            rest["ds"].batch(batch_size)
             
             return out
         return prepare

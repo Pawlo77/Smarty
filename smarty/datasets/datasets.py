@@ -1,3 +1,4 @@
+from tkinter import N
 import numpy as np
 
 from smarty.errors import assertion
@@ -221,10 +222,11 @@ class DataSet(TrainingProperty, StatisticsProperty):
         """
         return self.matrix_
 
-    def drop_c(self, key):
+    def drop_c(self, key, delete=True):
         """Removes columns from DataSet and returns them as new DataSet instance
 
         :param str | list | int key: column name (str), list of column names (list of strs), column index (int) or list of columns indexes (list of ints)
+        :param bool delete: If false value rows won't be deleted but only returned
         :raises: AssertionError if key is not valid
         """
         if isinstance(key, str): # single column by name
@@ -243,22 +245,30 @@ class DataSet(TrainingProperty, StatisticsProperty):
             c = [c]
             d = [d]
 
-        self.matrix_ = np.delete(self.matrix_, key, axis=1)
-        self.dtypes_ = np.delete(self.dtypes_, key)
-        self.columns_ = np.delete(self.columns_, key)
+        if delete:
+            self.matrix_ = np.delete(self.matrix_, key, axis=1)
+            self.dtypes_ = np.delete(self.dtypes_, key)
+            self.columns_ = np.delete(self.columns_, key)
 
         return DataSet().from_object(dt, columns=c, dtypes=d)
         
-    def drop_r(self, key):
+    def drop_r(self, key, delete=True):
         """Removes rows from dataset and returns them as new DataSet instance
         
         :param int | list key: row idx or list of rows indexes (list of ints)
+        :param bool delete: If false value rows won't be deleted but only returned
         :raises: AssertionError if key is not valid
         """
         assertion(type(key) == int or (type(key) == list and type(key[0]) == int) or type(key) == slice, "Wrong row specifier")
 
         dt = self.matrix_[key, :]
-        self.matrix_ = np.delete(self.matrix_, key, axis=0)
+
+        if delete:
+            self.matrix_ = np.delete(self.matrix_, key, axis=0)
+
+        if len(dt.shape) == 1: # single row
+            dt = dt[np.newaxis, ...]
+
         new = DataSet().from_object(dt, columns=self.columns_, dtypes=self.dtypes_)
         self.train_copy(new)
         return new
