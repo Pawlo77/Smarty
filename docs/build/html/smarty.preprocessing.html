@@ -44,7 +44,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="smarty.config module" href="smarty.config.html" />
-    <link rel="prev" title="smarty.models package" href="smarty.models.html" /> 
+    <link rel="prev" title="smarty.callbacks module" href="smarty.callbacks.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -92,6 +92,8 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="smarty.datasets.html">smarty.datasets package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.metrics.html">smarty.metrics module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="smarty.callbacks.html">smarty.callbacks module</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">smarty.preprocessing package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#smarty-preprocessing-categorical-module">smarty.preprocessing.categorical module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#smarty-preprocessing-numerical-module">smarty.preprocessing.numerical module</a></li>
@@ -270,6 +272,90 @@
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.preprocessing.categorical.SimpleEncoder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.preprocessing.categorical.</span></span><span class="sig-name descname"><span class="pre">SimpleEncoder</span></span><a class="reference internal" href="_modules/smarty/preprocessing/categorical.html#SimpleEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.preprocessing.categorical.SimpleEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Maps each unique value to unique numerical value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoders_</strong> (<em>list of dictionaries</em>) – list of dictionaries, dict on index i is a map of value -&gt; one hot for a column i</p></li>
+<li><p><strong>decoders_</strong> (<em>list of dictionaries</em>) – inversion of encoders_, maps one hot -&gt; original value</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>.fit() method needs to be called first.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.preprocessing.categorical.SimpleEncoder.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/preprocessing/categorical.html#SimpleEncoder.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.preprocessing.categorical.SimpleEncoder.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares a map for each column of cols.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cols</strong> (<em>np.ndarray</em>) – 2D array, where axis-1 are rows</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p>AssertionError if Encoder was already fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.preprocessing.categorical.SimpleEncoder.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/preprocessing/categorical.html#SimpleEncoder.fit_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.preprocessing.categorical.SimpleEncoder.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits Encoder with cols and returns their one-hot representation. (calls .fit() than .transform())</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cols</strong> (<em>np.ndarray</em>) – 2D array, where axis-1 are rows</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Unlike .fit(), this method will not return OneHotEncoder itself, it should be initialized first if you don’t want to loose the maps.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.preprocessing.categorical.SimpleEncoder.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/preprocessing/categorical.html#SimpleEncoder.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.preprocessing.categorical.SimpleEncoder.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms cols into one-hots according to maps created in .fit()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cols</strong> (<em>np.ndarray</em>) – 2D array, where axis-1 are rows</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p>AssertionError if Encoder wasn’t fitted  or number of columns in cols is different than that in .fit()</p>
+</dd>
+</dl>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>Function will crash if any value in cols wasn’t seen by .fit() method. (wasn’t map into encoders_)</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.preprocessing.categorical.SimpleEncoder.translate">
+<span class="sig-name descname"><span class="pre">translate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/preprocessing/categorical.html#SimpleEncoder.translate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.preprocessing.categorical.SimpleEncoder.translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translates one-hots back to the original value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cols</strong> (<em>np.ndarray</em>) – 2D array, where axis-1 are rows</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p>AssertionError if Encoder wasn’t fitted  or number of columns in cols is different than that returned by .transform()</p>
+</dd>
+</dl>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>Function will crash if any value in cols wasn’t seen by .fit() method. (wasn’t mapped into decoders_)</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="smarty-preprocessing-numerical-module">
 <h2>smarty.preprocessing.numerical module<a class="headerlink" href="#smarty-preprocessing-numerical-module" title="Permalink to this heading">¶</a></h2>
@@ -371,7 +457,7 @@
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="smarty.config.html" class="btn btn-neutral float-right" title="smarty.config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="smarty.models.html" class="btn btn-neutral float-left" title="smarty.models package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="smarty.callbacks.html" class="btn btn-neutral float-left" title="smarty.callbacks module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

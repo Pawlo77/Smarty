@@ -164,6 +164,7 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="kn">from</span> <span class="nn">smarty.errors</span> <span class="kn">import</span> <span class="n">assertion</span>
+<span class="kn">from</span> <span class="nn">smarty.config</span> <span class="kn">import</span> <span class="n">temp_config</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">prepare_ds</span><span class="p">,</span> <span class="n">print_epoch</span><span class="p">,</span> <span class="n">print_step</span><span class="p">,</span> <span class="n">handle_callbacks</span><span class="p">,</span> <span class="n">print_info</span>
 
 
@@ -179,8 +180,17 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
 
+    <span class="k">def</span> <span class="nf">fit_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predict</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">kw</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">predict</span><span class="p">:</span>
+            <span class="c1"># turn of verbose for predicting the training performance</span>
+            <span class="k">with</span> <span class="n">temp_config</span><span class="p">(</span><span class="n">VERBOSE</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">fitted</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+                <span class="n">kw</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">get_target_classes</span><span class="p">(),</span> <span class="n">y_pred</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">kw</span>
+
     <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;root_fitted&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">fitted</span><span class="p">}</span>
 
 
 <span class="k">class</span> <span class="nc">MiniBatchGradientDescent</span><span class="p">(</span><span class="n">BaseSolver</span><span class="p">):</span>
@@ -194,7 +204,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Trains the model&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">m_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_classes_</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -229,10 +238,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Training loss over epoch&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :returns: np.ndarray of predicted targets for X_b</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">X_b</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">coefs_</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bias_</span>
 
     <span class="k">def</span> <span class="nf">gradient_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_b</span><span class="p">,</span> <span class="n">y_b</span><span class="p">):</span>
@@ -281,7 +287,7 @@
         <span class="n">x_max_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">x</span><span class="p">))[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">x_min_idx</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="n">x_max_idx</span><span class="p">]]</span>
         <span class="n">ys</span> <span class="o">=</span> <span class="p">[</span><span class="n">y_pred</span><span class="p">[</span><span class="n">x_min_idx</span><span class="p">],</span> <span class="n">y_pred</span><span class="p">[</span><span class="n">x_max_idx</span><span class="p">]]</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="s2">&quot;g-&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;regression line&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="s2">&quot;g-&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;decision line&quot;</span><span class="p">)</span>
 
         <span class="n">x_lim</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">x_min_idx</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="n">x_max_idx</span><span class="p">]]</span>
         <span class="n">y_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
@@ -292,8 +298,8 @@
 
         <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">*</span><span class="n">x_lim</span><span class="p">,</span> <span class="o">*</span><span class="n">y_lim</span><span class="p">])</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_classes_</span><span class="p">[</span><span class="n">data_idx</span><span class="p">])</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">target_classes_</span><span class="p">[</span><span class="n">target_idx</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">columns_</span><span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">data_classes_</span><span class="p">[</span><span class="n">data_idx</span><span class="p">]])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">columns_</span><span class="p">[</span><span class="n">ds</span><span class="o">.</span><span class="n">target_classes_</span><span class="p">[</span><span class="n">target_idx</span><span class="p">]])</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="BaseModel.evaluate"><a class="viewcode-back" href="../../../smarty.models.html#smarty.models.dumb.BaseModel.evaluate">[docs]</a>    <span class="nd">@prepare_ds</span><span class="p">()</span>
@@ -330,7 +336,7 @@
             <span class="k">if</span> <span class="n">ds</span><span class="o">.</span><span class="n">target_classes_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">x_b</span> <span class="o">=</span> <span class="n">x_b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># drop target</span>
 
-            <span class="n">y_pred_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_b</span><span class="p">)</span>
+            <span class="n">y_pred_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver_</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_b</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="n">print_step</span><span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">steps_per_epoch_</span><span class="p">())</span>
 
             <span class="k">if</span> <span class="n">y_pred</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

@@ -3,7 +3,6 @@ import pydot
 
 from smarty.errors import assertion
 from smarty.metrics import accuracy
-from smarty.config import temp_config
 from .utils import print_epoch, print_step, print_info
 from .base import BaseSolver, BaseModel
 
@@ -109,17 +108,13 @@ class DecisionTreeSolver(BaseSolver):
         else:
             return node, set((node.target, ))
     
-    def fit(self, ds, *args, **kwargs):
+    def fit(self, ds, predict=True, *args, **kwargs):
         print_epoch(1, 1)
         print_step(0, 1)
         self.root.root_node_, _ = self.create_tree(ds, 1)
 
-        # turn of verbose for predicting the training performance
         kw = {}
-        with temp_config(VERBOSE=False): 
-            self.root.fitted = True
-            y_pred = self.root.predict(ds)
-            kw[self.root.loss.__name__] = self.root.loss(ds.get_target_classes(), y_pred)
+        self.fit_predict(predict, ds, kw)
         print_step(1, 1, **kw)
 
     def predict(self, x_b, *args, **kwargs):
@@ -156,7 +151,7 @@ class DecisionTreeSolver(BaseSolver):
         })
 
 
-class DecisionTree(BaseModel):
+class DecisionTreeClassifier(BaseModel):
     """Decision tree model
     
     :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics
@@ -165,7 +160,7 @@ class DecisionTree(BaseModel):
     """
 
     def __init__(self, max_depth=3, min_samples=5, loss=accuracy, *args, **kwargs):
-        super(DecisionTree, self).__init__(*args, **kwargs)
+        super(DecisionTreeClassifier, self).__init__(*args, **kwargs)
         self.max_depth_ = max_depth
         self.min_samples_ = min_samples
         self.loss = loss
@@ -199,5 +194,5 @@ class DecisionTree(BaseModel):
         graph.write_png(f"{name}.png")
         
     def clean_copy(self):
-        return DecisionTree(self.max_depth_, self.max_samples_)
+        return DecisionTreeClassifier(self.max_depth_, self.max_samples_)
 

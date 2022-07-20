@@ -89,6 +89,8 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.datasets.html">smarty.datasets package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.models.html">smarty.models package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.metrics.html">smarty.metrics module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../smarty.callbacks.html">smarty.callbacks module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.preprocessing.html">smarty.preprocessing package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.config.html">smarty.config module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../smarty.errors.html">smarty.errors module</a></li>
@@ -280,6 +282,100 @@
         <span class="n">code_</span> <span class="o">=</span>  <span class="n">empty_code_</span><span class="p">[:]</span>
         <span class="n">code_</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">code_</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SimpleEncoder"><a class="viewcode-back" href="../../../smarty.preprocessing.html#smarty.preprocessing.categorical.SimpleEncoder">[docs]</a><span class="k">class</span> <span class="nc">SimpleEncoder</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Maps each unique value to unique numerical value</span>
+
+<span class="sd">    :var list of dictionaries encoders\_: list of dictionaries, dict on index i is a map of value -&gt; one hot for a column i</span>
+<span class="sd">    :var list of dictionaries decoders\_: inversion of encoders\_, maps one hot -&gt; original value</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        .fit() method needs to be called first.</span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoders_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoders_</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="SimpleEncoder.fit"><a class="viewcode-back" href="../../../smarty.preprocessing.html#smarty.preprocessing.categorical.SimpleEncoder.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Prepares a map for each column of cols.</span>
+<span class="sd">        </span>
+<span class="sd">        :param np.ndarray cols: 2D array, where axis-1 are rows</span>
+<span class="sd">        :raises: AssertionError if Encoder was already fitted</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s2">&quot;Wrong col type provided&quot;</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoders_</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Encoder already fitted.&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cols</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span> <span class="c1"># for each provided column</span>
+            <span class="n">unique</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">cols</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">encoders_</span><span class="o">.</span><span class="n">append</span><span class="p">({</span> <span class="c1"># for each unique value assign it an integer</span>
+                <span class="n">u</span><span class="p">:</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique</span><span class="p">)</span>
+            <span class="p">})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">decoders_</span><span class="o">.</span><span class="n">append</span><span class="p">({</span> <span class="c1"># reversed encoders_ lookup for faster decoding the codes</span>
+                <span class="n">code_</span><span class="p">:</span> <span class="n">class_</span> <span class="k">for</span> <span class="n">class_</span><span class="p">,</span> <span class="n">code_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoders_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoders_</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+    
+<div class="viewcode-block" id="SimpleEncoder.transform"><a class="viewcode-back" href="../../../smarty.preprocessing.html#smarty.preprocessing.categorical.SimpleEncoder.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transforms cols into one-hots according to maps created in .fit()</span>
+
+<span class="sd">        :param np.ndarray cols: 2D array, where axis-1 are rows</span>
+<span class="sd">        :raises: AssertionError if Encoder wasn&#39;t fitted  or number of columns in cols is different than that in .fit()</span>
+
+<span class="sd">        .. danger::</span>
+<span class="sd">            Function will crash if any value in cols wasn&#39;t seen by .fit() method. (wasn&#39;t map into encoders\_)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="n">cols</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols_</span><span class="p">,</span> <span class="s2">&quot;Different number of columns provided to one in .fit()&quot;</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoders_</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Call .fit() first.&quot;</span><span class="p">)</span>
+
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="c1"># in case transformed data didn&#39;t fit in the original array dtype</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_cols_</span><span class="p">):</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">encoders_</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">val</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]])</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">col</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">res</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="SimpleEncoder.fit_transform"><a class="viewcode-back" href="../../../smarty.preprocessing.html#smarty.preprocessing.categorical.SimpleEncoder.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fits Encoder with cols and returns their one-hot representation. (calls .fit() than .transform())</span>
+<span class="sd">        </span>
+<span class="sd">        :param np.ndarray cols: 2D array, where axis-1 are rows</span>
+
+<span class="sd">        .. warning::</span>
+<span class="sd">            Unlike .fit(), this method will not return OneHotEncoder itself, it should be initialized first if you don&#39;t want to loose the maps.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span></div>
+
+    <span class="c1"># translate transformed data back to its original state</span>
+<div class="viewcode-block" id="SimpleEncoder.translate"><a class="viewcode-back" href="../../../smarty.preprocessing.html#smarty.preprocessing.categorical.SimpleEncoder.translate">[docs]</a>    <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Translates one-hots back to the original value</span>
+<span class="sd">        </span>
+<span class="sd">        :param np.ndarray cols: 2D array, where axis-1 are rows</span>
+<span class="sd">        :raises: AssertionError if Encoder wasn&#39;t fitted  or number of columns in cols is different than that returned by .transform()</span>
+<span class="sd">        </span>
+<span class="sd">        .. danger::</span>
+<span class="sd">            Function will crash if any value in cols wasn&#39;t seen by .fit() method. (wasn&#39;t mapped into decoders\_)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="n">cols</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols_</span><span class="p">,</span> <span class="s2">&quot;Different number of columns provided to that returned by .transform()&quot;</span><span class="p">)</span>
+        <span class="n">assertion</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoders_</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Call .fit() first.&quot;</span><span class="p">)</span>
+
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="c1"># in case transformed data didn&#39;t fit in the original array</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_cols_</span><span class="p">):</span> 
+            <span class="n">col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">decoders_</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">val</span><span class="p">]</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">]])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">col</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">res</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">res</span></div></div>
 </pre></div>
 
            </div>

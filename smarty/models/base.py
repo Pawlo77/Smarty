@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from smarty.errors import assertion
+from smarty.config import temp_config
 from .utils import prepare_ds, print_epoch, print_step, handle_callbacks, print_info
 
 
@@ -16,6 +17,15 @@ class BaseSolver:
                 self.root.__dict__[key] = val
             else:
                 self.__dict__[key] = val
+
+    def fit_predict(self, predict, ds, kw):
+        if predict:
+            # turn of verbose for predicting the training performance
+            with temp_config(VERBOSE=False):
+                self.root.fitted = True
+                y_pred = self.root.predict(ds)
+                kw[self.root.loss.__name__] = self.root.loss(ds.get_target_classes(), y_pred)
+        return kw
 
     def get_params(self):
         return {"root_fitted": self.root.fitted}
@@ -115,7 +125,7 @@ class BaseModel:
         x_max_idx = np.where(x == np.nanmax(x))[-1][-1]
         xs = [x[x_min_idx], x[x_max_idx]]
         ys = [y_pred[x_min_idx], y_pred[x_max_idx]]
-        plt.plot(xs, ys, "g-", linewidth=4, label="regression line")
+        plt.plot(xs, ys, "g-", linewidth=4, label="decision line")
 
         x_lim = [x[x_min_idx], x[x_max_idx]]
         y_min = np.nanmin(y)
@@ -126,8 +136,8 @@ class BaseModel:
 
         plt.axis([*x_lim, *y_lim])
         plt.legend()
-        plt.xlabel(ds.data_classes_[data_idx])
-        plt.ylabel(ds.target_classes_[target_idx])
+        plt.xlabel(ds.columns_[ds.data_classes_[data_idx]])
+        plt.ylabel(ds.columns_[ds.target_classes_[target_idx]])
         plt.show()
 
     @prepare_ds()

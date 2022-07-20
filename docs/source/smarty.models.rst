@@ -43,6 +43,14 @@ smarty.models.naive module
    :inherited-members:
    :show-inheritance:
 
+smarty.models.neighbours module
+-------------------------------
+
+.. automodule:: smarty.models.neighbours
+   :members:
+   :inherited-members:
+   :show-inheritance:
+
 smarty.models.utils module
 --------------------------
 

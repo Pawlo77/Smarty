@@ -23,7 +23,7 @@ class NormalEqSolver(BaseSolver):
         self.root.bias_ = None
         self.root.coefs_ = None
 
-    def fit(self, ds, *args, **kwargs):
+    def fit(self, ds, predict=True, *args, **kwargs):
         print_epoch(1, 1)
         print_step(0, 1)
 
@@ -37,11 +37,8 @@ class NormalEqSolver(BaseSolver):
         self.root.coefs_ = all_[1:]
         self.root.bias_ = all_[0]
 
-        # turn off verbose for predicting the training performance
         kw = {}
-        with temp_config(VERBOSE=False):
-            y_pred = self.root.predict(ds, *args, **kwargs)
-            kw[self.root.loss.__name__] = self.root.loss(ds.get_target_classes(), y_pred)
+        self.fit_predict(predict, ds, kw)
         print_step(1, 1, **kw)
 
     def get_params(self):

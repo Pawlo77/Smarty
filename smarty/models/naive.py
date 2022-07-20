@@ -1,25 +1,19 @@
 import numpy as np
 
-from smarty.datasets import DataSet
 from smarty.errors import assertion
-from smarty.models.utils import prepare_ds, print_epoch, print_step
-from smarty.models.base import BaseModel, BaseSolver
 from smarty.metrics import accuracy
-from smarty.config import temp_config
+from .utils import prepare_ds, print_epoch, print_step
+from .base import BaseModel, BaseSolver
 
 
 class NaiveSolver(BaseSolver):
-    def fit(self, ds, *args, **kwargs):
+    def fit(self, ds, predict=True, *args, **kwargs):
         print_epoch(1, 1)
         print_step(0, 1)
         self.split_by_class(ds)
 
-        # turn of verbose for predicting the training performance
         kw = {}
-        with temp_config(VERBOSE=False):
-            self.root.fitted = True
-            y_pred = self.root.predict(ds)
-            kw[self.root.loss.__name__] = self.root.loss(ds.get_target_classes(), y_pred)
+        self.fit_predict(predict, ds, kw)
         print_step(1, 1, **kw)
 
     @prepare_ds(batch_size=1)
@@ -72,15 +66,15 @@ class NaiveSolver(BaseSolver):
         })
 
 
-class NaiveBayes(BaseModel):
-    """NaiveBayes model
+class NaiveBayesCLassifier(BaseModel):
+    """NaiveBayesCLassifier model
 
     :param loss: evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics
     """
     def __init__(self, loss=accuracy, *args, **kwargs):
-        super(NaiveBayes, self).__init__(*args, **kwargs)
+        super(NaiveBayesCLassifier, self).__init__(*args, **kwargs)
         self.solver_ = NaiveSolver(self)
         self.loss = loss
 
     def clean_copy(self):
-        return NaiveBayes(self.loss)
+        return NaiveBayesCLassifier(self.loss)

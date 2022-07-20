@@ -96,6 +96,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#smarty-models-dumb-module">smarty.models.dumb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.linear">smarty.models.linear module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.tree">smarty.models.tree module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.naive">smarty.models.naive module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.neighbours">smarty.models.neighbours module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.utils">smarty.models.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-smarty.models.base">smarty.models.base module</a></li>
 </ul>
@@ -867,20 +869,22 @@
 <section id="module-smarty.models.tree">
 <span id="smarty-models-tree-module"></span><h2>smarty.models.tree module<a class="headerlink" href="#module-smarty.models.tree" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="smarty.models.tree.DecisionTree">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.tree.</span></span><span class="sig-name descname"><span class="pre">DecisionTree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_depth=3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples=5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss=&lt;function</span> <span class="pre">accuracy&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/tree.html#DecisionTree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.tree.DecisionTree" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="smarty.models.tree.DecisionTreeClassifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.tree.</span></span><span class="sig-name descname"><span class="pre">DecisionTreeClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_depth=3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_samples=5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss=&lt;function</span> <span class="pre">accuracy&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/tree.html#DecisionTreeClassifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.tree.DecisionTreeClassifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#smarty.models.base.BaseModel" title="smarty.models.base.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Decision tree model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</p></li>
 <li><p><strong>max_depth</strong> (<em>int</em>) – maximum number of splits</p></li>
 <li><p><strong>min_samples</strong> (<em>int</em>) – minimum number of samples each split must have</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="smarty.models.tree.DecisionTree.evaluate">
-<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTree.evaluate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="smarty.models.tree.DecisionTreeClassifier.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTreeClassifier.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluates model on the ds according to loss and prints its score</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -899,8 +903,8 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="smarty.models.tree.DecisionTree.fit">
-<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTree.fit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="smarty.models.tree.DecisionTreeClassifier.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTreeClassifier.fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>‘Trains’ the model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -913,14 +917,14 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="smarty.models.tree.DecisionTree.get_params">
-<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTree.get_params" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="smarty.models.tree.DecisionTreeClassifier.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTreeClassifier.get_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns dict of parameters allowing exact coping of a model</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="smarty.models.tree.DecisionTree.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTree.plot" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="smarty.models.tree.DecisionTreeClassifier.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTreeClassifier.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a 2D plot where x-axis is data_idx, and y-axis is target_idx. Plots both their value and prediction curve</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -937,14 +941,14 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="smarty.models.tree.DecisionTree.plot_tree">
-<span class="sig-name descname"><span class="pre">plot_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'my_tree'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/tree.html#DecisionTree.plot_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.tree.DecisionTree.plot_tree" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="smarty.models.tree.DecisionTreeClassifier.plot_tree">
+<span class="sig-name descname"><span class="pre">plot_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'my_tree'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/tree.html#DecisionTreeClassifier.plot_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.tree.DecisionTreeClassifier.plot_tree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates tree diagram and saves is as name.png</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="smarty.models.tree.DecisionTree.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTree.predict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="smarty.models.tree.DecisionTreeClassifier.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTreeClassifier.predict" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p>
@@ -959,8 +963,307 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="smarty.models.tree.DecisionTree.set_params">
-<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTree.set_params" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="smarty.models.tree.DecisionTreeClassifier.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.tree.DecisionTreeClassifier.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set params to model’s and solver’s dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em>) – dict of parameters, to indicate that they belong to solver name should start with ‘root__’</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-smarty.models.naive">
+<span id="smarty-models-naive-module"></span><h2>smarty.models.naive module<a class="headerlink" href="#module-smarty.models.naive" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.models.naive.NaiveBayesCLassifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.naive.</span></span><span class="sig-name descname"><span class="pre">NaiveBayesCLassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss=&lt;function</span> <span class="pre">accuracy&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/naive.html#NaiveBayesCLassifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.naive.NaiveBayesCLassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smarty.models.base.BaseModel" title="smarty.models.base.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>NaiveBayesCLassifier model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.naive.NaiveBayesCLassifier.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.naive.NaiveBayesCLassifier.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates model on the ds according to loss and prints its score</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics. If not provided, loss given on model initialization will be used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>will be passed to .predict()</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>score</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.naive.NaiveBayesCLassifier.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.naive.NaiveBayesCLassifier.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘Trains’ the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.naive.NaiveBayesCLassifier.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.naive.NaiveBayesCLassifier.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dict of parameters allowing exact coping of a model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.naive.NaiveBayesCLassifier.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.naive.NaiveBayesCLassifier.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a 2D plot where x-axis is data_idx, and y-axis is target_idx. Plots both their value and prediction curve</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>data_idx</strong> (<em>int</em>) – data column index used as x-axis</p></li>
+<li><p><strong>target_class</strong> (<em>int</em>) – target class index used as y-axis (0 - first target class, 1 - second (if exists) and so on)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>will be passed to .predict()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.naive.NaiveBayesCLassifier.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.naive.NaiveBayesCLassifier.predict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D np.ndarray, where each culumn holds prediction for one of the targets</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError if model is not fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.naive.NaiveBayesCLassifier.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.naive.NaiveBayesCLassifier.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set params to model’s and solver’s dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em>) – dict of parameters, to indicate that they belong to solver name should start with ‘root__’</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-smarty.models.neighbours">
+<span id="smarty-models-neighbours-module"></span><h2>smarty.models.neighbours module<a class="headerlink" href="#module-smarty.models.neighbours" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNClassifier">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.neighbours.</span></span><span class="sig-name descname"><span class="pre">KNNClassifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss=&lt;function</span> <span class="pre">accuracy&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/neighbours.html#KNNClassifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.neighbours.KNNClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smarty.models.base.BaseModel" title="smarty.models.base.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>K Nearest Neighbors Classifier
+Default k is 5, to change it pass it in .predict(), .fit() or .evaluate()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNClassifier.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNClassifier.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates model on the ds according to loss and prints its score</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics. If not provided, loss given on model initialization will be used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>will be passed to .predict()</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>score</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNClassifier.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNClassifier.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘Trains’ the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNClassifier.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNClassifier.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dict of parameters allowing exact coping of a model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNClassifier.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNClassifier.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a 2D plot where x-axis is data_idx, and y-axis is target_idx. Plots both their value and prediction curve</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>data_idx</strong> (<em>int</em>) – data column index used as x-axis</p></li>
+<li><p><strong>target_class</strong> (<em>int</em>) – target class index used as y-axis (0 - first target class, 1 - second (if exists) and so on)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>will be passed to .predict()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNClassifier.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNClassifier.predict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D np.ndarray, where each culumn holds prediction for one of the targets</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError if model is not fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNClassifier.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNClassifier.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set params to model’s and solver’s dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em>) – dict of parameters, to indicate that they belong to solver name should start with ‘root__’</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNRegressor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">smarty.models.neighbours.</span></span><span class="sig-name descname"><span class="pre">KNNRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss=&lt;function</span> <span class="pre">root_mean_squared_error&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy='mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/smarty/models/neighbours.html#KNNRegressor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#smarty.models.neighbours.KNNRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#smarty.models.base.BaseModel" title="smarty.models.base.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>K Nearest Neighbors Regressor
+Default k is 5, to change it pass it in .predict(), .fit() or .evaluate()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNRegressor.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNRegressor.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates model on the ds according to loss and prints its score</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>loss</strong> – evaluation loss, has to accept y and y_pred and return score: for pre-defined see smarty.models.metrics. If not provided, loss given on model initialization will be used</p></li>
+</ul>
+</dd>
+<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>will be passed to .predict()</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>score</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNRegressor.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNRegressor.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘Trains’ the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNRegressor.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNRegressor.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dict of parameters allowing exact coping of a model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNRegressor.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNRegressor.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a 2D plot where x-axis is data_idx, and y-axis is target_idx. Plots both their value and prediction curve</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p></li>
+<li><p><strong>data_idx</strong> (<em>int</em>) – data column index used as x-axis</p></li>
+<li><p><strong>target_class</strong> (<em>int</em>) – target class index used as y-axis (0 - first target class, 1 - second (if exists) and so on)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Params args, kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>will be passed to .predict()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNRegressor.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNRegressor.predict" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ds</strong> (<a class="reference internal" href="smarty.datasets.html#smarty.datasets.datasets.DataSet" title="smarty.datasets.datasets.DataSet"><em>DataSet</em></a>) – a DataSet - data source, needs to have specified target classes and shape[1] simmilar to seen in .fit()</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>2D np.ndarray, where each culumn holds prediction for one of the targets</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError if model is not fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="smarty.models.neighbours.KNNRegressor.set_params">
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#smarty.models.neighbours.KNNRegressor.set_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set params to model’s and solver’s dict</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
