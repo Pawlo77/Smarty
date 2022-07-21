@@ -103,10 +103,11 @@ def print_info(info):
     print(info)
 
 # calls each callback found
-def handle_callbacks(root, kwargs, losses):
+def handle_callbacks(root, kwargs, **mykwargs):
     flag = True # marks whereas training can be continued
 
     if "callbacks" in kwargs:
         for callback in kwargs["callbacks"]:
-            flag = flag and callback(root, losses)
+            flag = flag and callback(root, **mykwargs)
+        print()
     return flag

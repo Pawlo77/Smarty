@@ -22,7 +22,7 @@ smarty.models.linear module
 ---------------------------
 
 .. automodule:: smarty.models.linear
-   :exclude-members: PerceptronSolver, LogisticSgdSolver, LinearSgdSolver
+   :exclude-members: PerceptronSolver, LogisticSgdSolver, LinearSgdSolver, CoefSolver
    :inherited-members:
    :members:
    :show-inheritance:
@@ -47,6 +47,15 @@ smarty.models.neighbours module
 -------------------------------
 
 .. automodule:: smarty.models.neighbours
+   :members:
+   :inherited-members:
+   :show-inheritance:
+
+smarty.models.lvq module
+-------------------------------
+
+.. automodule:: smarty.models.lvq
+   :exclude-members: LVQSolver
    :members:
    :inherited-members:
    :show-inheritance:

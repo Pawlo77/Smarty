@@ -1,7 +1,6 @@
 import numpy as np
 
 from smarty.errors import assertion
-from smarty.config import temp_config
 from smarty.metrics import mean_squared_error, accuracy
 from .utils import print_epoch, print_step
 from .base import MiniBatchGradientDescent, BaseModel, BaseSolver
@@ -50,32 +49,61 @@ class NormalEqSolver(BaseSolver):
             "root__loss": self.root.loss,
         })
 
-    def predict(self, X_b, *args, **kwargs):
-        return X_b.dot(self.root.coefs_) + self.root.bias_
+    def predict(self, x_b, *args, **kwargs):
+        return x_b.dot(self.root.coefs_) + self.root.bias_
 
 
-class LinearSgdSolver(MiniBatchGradientDescent):
+class CoefSolver(MiniBatchGradientDescent):
+    def gradient_step(self, X_b, y_b):
+        """Performs coefficients optimization."""
+        y_pred = self.predict(X_b)
+        const = self.root.learning_rate_ / self.root.m_
+        error = y_pred - y_b
+
+        self.root.coefs_ -= const * X_b.T.dot(error)
+        self.root.bias_ -= const * np.sum(error)
+        return y_pred
+
+    def fit(self, ds, *args, **kwargs):
+        self.root.m_ = len(ds)
+        self.root.coefs_ = np.zeros((len(ds.data_classes_), 1))
+        self.root.bias_ = np.zeros((1, 1))
+        return super().fit(ds, *args, **kwargs)
+
+    def predict(self, x_b):
+        return x_b.dot(self.root.coefs_) + self.root.bias_
+
+    def get_params(self):
+        kw = super().get_params()
+        return kw.update({
+            "root__bias_": self.root.bias_,
+            "root__coefs_": self.root.coefs_,
+        })
+    
+
+class LinearSgdSolver(CoefSolver):
     pass
 
 
-class LogisticSgdSolver(MiniBatchGradientDescent):
-    def predict(self, X_b):
-        y_pred = super().predict(X_b)
+class LogisticSgdSolver(CoefSolver):
+    def predict(self, x_b):
+        y_pred = x_b.dot(self.root.coefs_) + self.root.bias_
         return (1.0 / (1.0 + np.exp(-y_pred))).astype("i")
 
 
-class PerceptronSolver(MiniBatchGradientDescent):
-    def predict(self, X_b):
-        y_pred = super().predict(X_b)
+class PerceptronSolver(CoefSolver):
+    def predict(self, x_b):
+        y_pred = x_b.dot(self.root.coefs_) + self.root.bias_
         idxs = np.where(y_pred > self.root.threshold_)
         y_pred = np.zeros(y_pred.shape, dtype=np.unit8)
         y_pred[idxs] = 1
         return y_pred
 
     def get_params(self): 
-        params = super().get_params()
-        params["root__threshold_"] = self.root.threshold_
-        return params
+        kw = super().get_params()
+        return kw.update({
+            "root__threshold_": self.root.threshold_
+        })
 
 
 class LinearRegression(BaseModel):

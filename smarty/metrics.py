@@ -6,7 +6,7 @@ import numpy as np
 
 def accuracy(y, y_pred):
     """Accuracy score"""
-    correct = np.count_nonzero(y == y_pred)
+    correct = np.count_nonzero(np.all(y == y_pred, axis=1))
     return correct / len(y)
 
 def confusion_matrix(y, y_pred, return_classes=False):

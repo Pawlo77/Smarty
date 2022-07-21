@@ -38,22 +38,16 @@ class MiniBatchGradientDescent(BaseSolver):
         super(MiniBatchGradientDescent, self).__init__(*args, **kwargs)
         self.root.costs_ = []
         self.root.plot_training = self.plot_training
-        self.root.bias_ = None
-        self.root.coefs_ = None
 
     def fit(self, ds, epochs=10, *args, **kwargs):
-        self.root.m_ = len(ds)
-        self.root.coefs_ = np.zeros((len(ds.data_classes_), 1))
-        self.root.bias_ = np.zeros((1, 1))
-
         src = iter(ds)
         for epoch in range(epochs):
             print_epoch(epoch + 1, epochs)
 
             losses = []
             for step in range(ds.steps_per_epoch_()):
-                X_b, y_b = next(src)
-                y_pred = self.gradient_step(X_b, y_b)
+                x_b, y_b = next(src)
+                y_pred = self.gradient_step(x_b, y_b)
 
                 loss = self.root.loss(y_b, y_pred)
                 losses.append(loss)
@@ -63,7 +57,7 @@ class MiniBatchGradientDescent(BaseSolver):
             
             self.root.costs_.append(np.mean(losses))
             
-            if not handle_callbacks(self.root, kwargs, losses):
+            if not handle_callbacks(self.root, kwargs, losses=losses, epoch=epoch, epochs=epochs):
                 return # end training loop
 
     def plot_training(self):
@@ -72,31 +66,23 @@ class MiniBatchGradientDescent(BaseSolver):
         plt.figure(figsize=(8, 6))
         plt.plot(list(range(len(self.root.costs_))), self.root.costs_, "r-")
         plt.xlabel("epoch")
-        plt.ylabel("loss")
-        plt.title("Training loss over epoch")
+        plt.ylabel(f"{self.root.loss.__name__}")
+        plt.title(f"Training {self.root.loss.__name__} over epoch")
         plt.show()
 
-    def predict(self, X_b, *args, **kwargs):
-        return X_b.dot(self.root.coefs_) + self.root.bias_
+    def predict(self, x_b, *args, **kwargs):
+        assertion(False, "Implement predict method.")
 
-    def gradient_step(self, X_b, y_b):
-        """Performs coefficients optimization."""
-        y_pred = self.predict(X_b)
-        const = self.root.learning_rate_ / self.root.m_
-        error = y_pred - y_b
-
-        self.root.coefs_ -= const * X_b.T.dot(error)
-        self.root.bias_ -= const * np.sum(error)
-        return y_pred
+    def gradient_step(self, x_b, y_b):
+        assertion(False, "Implement gradient_step method.")
     
     def get_params(self):
-        return { # root__ endicates that that param belongs to model __dict__ not solver __dict__
+        kw = super().get_params()
+        return kw.update({ # root__ endicates that that param belongs to model __dict__ not solver __dict__
             "root__costs_": self.root.costs_,
-            "root__bias_": self.root.bias_,
-            "root__coefs_": self.root.coefs_,
             "root__learning_rate_": self.root.learning_rate_,
             "root__loss": self.root.loss,
-        }
+        })
 
 
 class BaseModel:

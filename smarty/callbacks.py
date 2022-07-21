@@ -1,6 +1,27 @@
 import numpy as np
 
 from smarty.models.utils import print_info
+from smarty.errors import assertion
+
+
+class LearningRateSheduler:
+    """Learning Rate Scheduler callback
+    :param str mode: how to shedule the learning rate, pass any and assertion will print you available
+    """
+
+    def __init__(self, mode="linear_decay"):
+        self.modes_ = ["linear_decay"]
+        assertion(mode in self.modes_, f"Invalid mode, choose one among {', '.join(self.modes_)}")
+        self.mode_ = mode
+
+    def __call__(self, root, epoch, epochs, **kwargs):
+        if self.mode_ == "linear_decay":
+            new_learning_rate_ = root.learning_rate_ * (1. - epoch / epochs)
+
+        if new_learning_rate_ != root.learning_rate_:
+            print_info(f"Learning rate sheduled to {new_learning_rate_}")
+            root.learning_rate_ = new_learning_rate_
+        return True
 
 
 class EarlyStoping:
@@ -28,7 +49,7 @@ class EarlyStoping:
         """
         return np.mean(np.array(losses))
 
-    def __call__(self, root, losses):
+    def __call__(self, root, losses, **kwargs):
         score = self.get_score(losses)
         self.epochs += 1
 

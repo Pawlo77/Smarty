@@ -90,7 +90,7 @@ class KNNRegressor(BaseModel):
     def __init__(self, loss=root_mean_squared_error, strategy="mean", *args, **kwargs):
         super(KNNRegressor, self).__init__(*args, **kwargs)
         self.strategies = ["mean", "median"]
-        assertion(strategy in self.strategies, f"Strategy not recognized, choose from: {' '.join(self.strategies)}")
+        assertion(strategy in self.strategies, f"Strategy not recognized, choose from: {', '.join(self.strategies)}")
     
         self.mode_ = "regression"
         self.strategy = strategy
